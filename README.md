@@ -106,6 +106,16 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 - Al guardar aparece un aviso con enlace directo a **Mis builds**.
 - Los estados `RIESGO` e `INCOMPATIBLE` muestran su `motivo` y sugerencia cuando aplica.
 
+### Mis builds (007)
+
+- `/builds` lista las builds guardadas con estado, consumo, cuello de botella, CPU y GPU.
+- Incluye búsqueda por nombre, filtro por estado y orden por recientes, consumo o cuello.
+- El detalle muestra las 5 piezas, resolución, uso de la fuente y el `motivo` cuando no está balanceada.
+- **Abrir en el armador** navega a `/builder?from=<buildId>`.
+- **Eliminar** pide confirmación, actualiza la lista y muestra un aviso.
+- Deep link: `/builds?open=<buildId>` abre directamente el detalle.
+- `BuildsProvider` comparte la lista con Dashboard y Alertas. Al guardar una build se dispara un evento para refrescarla.
+
 > El SDD (`spec/`) y `AGENT.md` son locales del frontend y están ignorados por git.
 
 ## Variables de entorno
@@ -151,7 +161,7 @@ npm run test:coverage  # una pasada + reporte de cobertura
 
 Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
-Estado actual: **175 tests** y **> 90% de cobertura** de líneas.
+Estado actual: **194 tests** y **> 90% de cobertura** de líneas.
 
 ## Estructura
 
@@ -182,7 +192,7 @@ hardwareguru-frontend/
 - [x] **004** Catálogo de componentes con búsqueda, filtros y detalle
 - [x] **005** Armador con selectores dependientes
 - [x] **006** Simulación, explicación de problemas y guardado
-- [ ] **007** Mis builds: historial, detalle, abrir en armador y eliminar
+- [x] **007** Mis builds: historial, detalle, abrir en armador y eliminar
 - [ ] **008** Alertas: página, contador y listado
 - [ ] **009** Dashboard con estadísticas y accesos rápidos
 - [ ] **010** Chat Guru
