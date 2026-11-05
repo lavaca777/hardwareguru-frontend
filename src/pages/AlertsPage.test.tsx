@@ -88,7 +88,7 @@ describe('AlertsPage', () => {
     expect(
       await screen.findByText('Alerta marcada como leída.'),
     ).toBeInTheDocument()
-    expect(screen.getByText('1 pendientes')).toBeInTheDocument()
+    expect(screen.getByText('1 pendiente')).toBeInTheDocument()
     expect(screen.queryByText(ALERTA_FUENTE)).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('tab', { name: /Leídas/ }))

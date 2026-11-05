@@ -38,6 +38,10 @@ export function AlertsPage() {
 
   const total = pendientes.length + leidas.length
   const lista = filtro === 'pendientes' ? pendientes : leidas
+  const pendientesLabel =
+    pendientes.length === 1
+      ? '1 pendiente'
+      : `${pendientes.length} pendientes`
 
   const buildExists = (buildId: string): boolean | undefined => {
     if (buildsCargando || buildsError) return undefined
@@ -70,7 +74,7 @@ export function AlertsPage() {
         description={
           cargando && total === 0
             ? 'Cargando alertas…'
-            : `${pendientes.length} pendientes`
+            : pendientesLabel
         }
       />
 
@@ -122,7 +126,12 @@ export function AlertsPage() {
           />
 
           {lista.length === 0 ? (
-            <div className="mt-5">
+            <div
+              role="tabpanel"
+              id={`panel-${filtro}`}
+              aria-labelledby={`tab-${filtro}`}
+              className="mt-5"
+            >
               <EmptyState
                 titulo={
                   filtro === 'pendientes'
