@@ -95,6 +95,17 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 - `?from=<buildId>` precarga una build guardada desde `GET /builds`. Si no existe o le faltan piezas, se avisa.
 - La simulación y el guardado se conectan en la feature 006.
 
+### Simulación y guardado (006)
+
+- El botón **Simular rendimiento** permanece deshabilitado hasta completar las 5 piezas.
+- `POST /simular` devuelve consumo, cuello de botella, estado y `motivo`.
+- El panel muestra consumo, cuello de botella, uso de la fuente y estado (`Balanceado`, `En riesgo`, `Incompatible`).
+- Cambiar una pieza o la resolución marca el resultado como **desactualizado** y bloquea el guardado hasta volver a simular.
+- `POST /builds` guarda la build con nombre, piezas y resolución.
+- El modal de guardado valida nombre obligatorio y máximo de 60 caracteres, avisa si el nombre se repite y permite continuar.
+- Al guardar aparece un aviso con enlace directo a **Mis builds**.
+- Los estados `RIESGO` e `INCOMPATIBLE` muestran su `motivo` y sugerencia cuando aplica.
+
 > El SDD (`spec/`) y `AGENT.md` son locales del frontend y están ignorados por git.
 
 ## Variables de entorno
@@ -140,7 +151,7 @@ npm run test:coverage  # una pasada + reporte de cobertura
 
 Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
-Estado actual: **155 tests** y **> 90% de cobertura** de líneas.
+Estado actual: **175 tests** y **> 90% de cobertura** de líneas.
 
 ## Estructura
 
@@ -170,7 +181,7 @@ hardwareguru-frontend/
 - [x] **003** Login, registro, sesión y rutas protegidas
 - [x] **004** Catálogo de componentes con búsqueda, filtros y detalle
 - [x] **005** Armador con selectores dependientes
-- [ ] **006** Simulación, explicación de problemas y guardado
+- [x] **006** Simulación, explicación de problemas y guardado
 - [ ] **007** Mis builds: historial, detalle, abrir en armador y eliminar
 - [ ] **008** Alertas: página, contador y listado
 - [ ] **009** Dashboard con estadísticas y accesos rápidos

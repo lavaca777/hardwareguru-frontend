@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { api } from '@/api'
 import { PageHeader } from '@/components/PageHeader'
@@ -15,6 +15,10 @@ import {
 import { TYPE_LABELS } from '@/features/components/labels'
 import { FIELD_BY_TYPE } from '@/features/builder/rules'
 import { useBuilder } from '@/features/builder/useBuilder'
+import { SaveBuildModal } from '@/features/simulation/SaveBuildModal'
+import { ResultadosSimulacion } from '@/features/simulation/ResultadosSimulacion'
+import { getProblemMessage } from '@/features/simulation/mensajes'
+import { useSimulation } from '@/features/simulation/useSimulation'
 import type { Componente, Resolucion, TipoComponente } from '@/types'
 
 const TYPE_ORDER: TipoComponente[] = [
@@ -77,6 +81,8 @@ export function PCBuilderPage() {
     catalogo,
   } = useBuilder()
   const { mostrar } = useToast()
+  const simulation = useSimulation()
+  const [saveOpen, setSaveOpen] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const fromId = searchParams.get('from')
   const loadedFromRef = useRef<string | null>(null)
@@ -165,13 +171,6 @@ export function PCBuilderPage() {
     mostrar({ tipo: 'ok', texto: 'Selección reiniciada.' })
   }
 
-  const handleSimular = () => {
-    mostrar({
-      tipo: 'ok',
-      texto: 'La simulación se conecta en la siguiente feature.',
-    })
-  }
-
   const resumen = TYPE_ORDER.map((tipo) => {
     const id = seleccion[FIELD_BY_TYPE[tipo]]
     const componente = catalogo.todos.find((item) => item.id === id)
@@ -181,6 +180,30 @@ export function PCBuilderPage() {
       nombre: componente?.nombre ?? null,
     }
   })
+
+  const problem = simulation.resultado
+    ? getProblemMessage(simulation.resultado)
+    : null
+  const canSave =
+    simulation.resultado !== null &&
+    !simulation.desactualizado &&
+    !simulation.simulando &&
+    simulation.resultado.estado !== 'INCOMPATIBLE'
+
+  let saveDisabledReason: string | undefined
+  if (!completa) {
+    saveDisabledReason = 'Elige las 5 piezas para simular.'
+  } else if (simulation.simulando) {
+    saveDisabledReason = 'Espera a que termine la simulación.'
+  } else if (!simulation.resultado) {
+    saveDisabledReason = 'Simula la build antes de guardar.'
+  } else if (simulation.desactualizado) {
+    saveDisabledReason =
+      'Vuelve a simular porque la selección cambió.'
+  } else if (simulation.resultado.estado === 'INCOMPATIBLE') {
+    saveDisabledReason =
+      'No puedes guardar una build incompatible.'
+  }
 
   return (
     <section>
@@ -320,19 +343,80 @@ export function PCBuilderPage() {
 
                 <Button
                   className="mt-5 w-full"
-                  disabled={!completa}
-                  onClick={handleSimular}
+                  disabled={!completa || simulation.simulando}
+                  loading={simulation.simulando}
+                  title={
+                    !completa
+                      ? 'Elige las 5 piezas para simular'
+                      : undefined
+                  }
+                  onClick={() => void simulation.simular()}
                 >
                   Simular rendimiento
                 </Button>
+
+                <Button
+                  className="mt-2 w-full"
+                  variant="secondary"
+                  disabled={!canSave}
+                  title={saveDisabledReason}
+                  onClick={() => setSaveOpen(true)}
+                >
+                  Guardar build
+                </Button>
               </div>
 
-              <ProblemNotice tono="info" titulo="Siguiente paso">
-                La simulación, el análisis de problemas y el guardado se
-                conectan en la feature 006.
-              </ProblemNotice>
+              <div className="rounded-xl border border-line bg-panel p-5">
+                <h2 className="text-sm font-semibold text-ink">
+                  Resultado
+                </h2>
+                <div className="mt-4">
+                  <ResultadosSimulacion
+                    resultado={simulation.resultado}
+                    usoFuentePct={simulation.usoFuentePct}
+                    desactualizado={simulation.desactualizado}
+                    simulando={simulation.simulando}
+                    error={simulation.error}
+                    onReintentar={() => void simulation.simular()}
+                  />
+                </div>
+              </div>
             </div>
           </div>
+        )}
+
+      {problem && (
+        <div className="mt-5">
+          <ProblemNotice
+            tono={problem.tono}
+            titulo={problem.titulo}
+            sugerencia={problem.sugerencia}
+          >
+            {problem.texto}
+          </ProblemNotice>
+        </div>
+      )}
+
+      {saveOpen &&
+        simulation.resultado &&
+        !simulation.desactualizado &&
+        simulation.resultado.estado !== 'INCOMPATIBLE' && (
+          <SaveBuildModal
+            seleccion={seleccion}
+            resolucion={resolucion}
+            onClose={() => setSaveOpen(false)}
+            onSaved={(build) => {
+              setSaveOpen(false)
+              mostrar({
+                tipo: 'ok',
+                texto: `Build "${build.nombre}" guardada.`,
+                accion: {
+                  etiqueta: 'Ver mis builds',
+                  href: '/builds',
+                },
+              })
+            }}
+          />
         )}
     </section>
   )
