@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '@/App'
 import { AuthProvider } from '@/auth/AuthProvider'
 import { saveSession } from '@/auth/session'
+import { ToastProvider } from '@/components/ui'
 import { AppRouter } from './AppRouter'
 
 const session = {
@@ -28,7 +29,9 @@ function renderApp(path: string, authenticated = false) {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <AuthProvider>
-        <AppRouter />
+        <ToastProvider>
+          <AppRouter />
+        </ToastProvider>
       </AuthProvider>
     </MemoryRouter>,
   )

@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { ToastProvider } from '@/components/ui'
 import { AppRouter } from '@/routes/AppRouter'
 import { AuthProvider } from './AuthProvider'
 import { SESSION_EXPIRED_KEY } from './session'
@@ -21,7 +22,9 @@ function renderFlow(path = '/login') {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <AuthProvider>
-        <AppRouter />
+        <ToastProvider>
+          <AppRouter />
+        </ToastProvider>
       </AuthProvider>
     </MemoryRouter>,
   )
