@@ -127,9 +127,9 @@ hardwareguru-frontend/
 
 ## Checklist de avance
 
-- [ ] **001** Vite + React + TS, Tailwind, ruteo, cliente HTTP, config y mocks
-- [ ] **002** Estructura común, navegación y componentes compartidos
-- [ ] **003** Login, registro, sesión y rutas protegidas
+- [x] **001** Vite + React + TS, Tailwind, ruteo, cliente HTTP, config y mocks
+- [x] **002** Estructura común, navegación y componentes compartidos
+- [x] **003** Login, registro, sesión y rutas protegidas
 - [ ] **004** Catálogo de componentes con búsqueda, filtros y detalle
 - [ ] **005** Armador con selectores dependientes
 - [ ] **006** Simulación, explicación de problemas y guardado

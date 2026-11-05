@@ -1,3 +1,4 @@
+import { AuthProvider } from '@/auth/AuthProvider'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ToastProvider } from '@/components/ui/Toast'
 import { getApiConfigError } from '@/config'
@@ -10,11 +11,13 @@ export default function App() {
   return (
     <ErrorBoundary>
       <ToastProvider>
-        {configError ? (
-          <ConfigurationErrorPage message={configError} />
-        ) : (
-          <AppRouter />
-        )}
+        <AuthProvider>
+          {configError ? (
+            <ConfigurationErrorPage message={configError} />
+          ) : (
+            <AppRouter />
+          )}
+        </AuthProvider>
       </ToastProvider>
     </ErrorBoundary>
   )
