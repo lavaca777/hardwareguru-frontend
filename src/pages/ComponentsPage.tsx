@@ -12,26 +12,11 @@ import {
 } from '@/components/ui'
 import { useComponentes } from '@/features/components/componentesContext'
 import { matchesSearch } from '@/features/components/search'
+import { TYPE_ITEMS, TYPE_LABELS } from '@/features/components/labels'
 import { useComponenteDetalle } from '@/features/components/useComponenteDetalle'
 import type { Componente, ComponenteDetalle, TipoComponente } from '@/types'
 
 const FILTER_ALL = 'all'
-
-const TYPE_ITEMS: Array<{ id: TipoComponente; label: string }> = [
-  { id: 'cpu', label: 'Procesadores' },
-  { id: 'placa', label: 'Placas madre' },
-  { id: 'ram', label: 'Memorias RAM' },
-  { id: 'gpu', label: 'Tarjetas gráficas' },
-  { id: 'fuente', label: 'Fuentes' },
-]
-
-const TYPE_LABELS: Record<TipoComponente, string> = {
-  cpu: 'Procesador',
-  placa: 'Placa madre',
-  ram: 'Memoria RAM',
-  gpu: 'Tarjeta gráfica',
-  fuente: 'Fuente',
-}
 
 const SPEC_LABELS: Record<string, string> = {
   fabricante: 'Fabricante',
