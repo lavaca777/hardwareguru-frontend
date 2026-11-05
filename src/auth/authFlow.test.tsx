@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ToastProvider } from '@/components/ui'
 import { AppRouter } from '@/routes/AppRouter'
 import { AuthProvider } from './AuthProvider'
-import { SESSION_EXPIRED_KEY } from './session'
+import { SESSION_EXPIRED_KEY, saveSession } from './session'
 
 beforeEach(() => {
   localStorage.clear()
@@ -128,6 +128,25 @@ describe('flujo de login', () => {
 
     expect(screen.getByText('Tu sesión expiró')).toBeInTheDocument()
     expect(sessionStorage.getItem(SESSION_EXPIRED_KEY)).toBeNull()
+  })
+
+  it('permite cerrar sesión desde Mi cuenta', async () => {
+    saveSession({
+      token: 'test-token',
+      user: { id: 'u1', email: 'a@b.com' },
+    })
+    const user = userEvent.setup()
+    renderFlow('/account')
+
+    expect(
+      await screen.findByRole('heading', { name: 'Mi cuenta' }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Cerrar sesión' }))
+
+    expect(
+      await screen.findByRole('heading', { name: 'Iniciar sesión' }),
+    ).toBeInTheDocument()
   })
 })
 

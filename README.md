@@ -68,6 +68,7 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 - Las rutas privadas ahora exigen sesión; sin sesión redirigen a `/login`.
 - La sesión se guarda en `localStorage` bajo `hg_session`. Un `401` la limpia y muestra “Tu sesión expiró”.
 - Después del login se vuelve a la ruta protegida que se intentaba abrir.
+- El cierre de sesión está disponible en **Mi cuenta**.
 - En modo mock:
   - cualquier correo válido + contraseña de 8 o más caracteres inicia sesión;
   - `error@test.com` simula credenciales inválidas;
