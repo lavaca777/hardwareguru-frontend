@@ -20,4 +20,8 @@ export type { TabItem } from './Tabs'
 export { TextField } from './TextField'
 export { ToastProvider } from './Toast'
 export { useToast } from './ToastContext'
-export type { ToastOpciones, ToastTipo } from './ToastContext'
+export type {
+  ToastAccion,
+  ToastOpciones,
+  ToastTipo,
+} from './ToastContext'

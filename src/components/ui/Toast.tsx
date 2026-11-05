@@ -6,6 +6,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { Link } from 'react-router'
 import {
   AlertTriangleIcon,
   CheckIcon,
@@ -32,14 +33,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const mostrar = useCallback(
-    ({ tipo, texto, duracionMs }: ToastOpciones) => {
+    ({ tipo, texto, duracionMs, accion }: ToastOpciones) => {
       const id = nextId.current++
       const duration = Math.max(
         0,
         duracionMs ?? (tipo === 'error' ? 8000 : 5000),
       )
 
-      setToasts((prev) => [...prev.slice(-2), { id, tipo, texto }])
+      setToasts((prev) => [
+        ...prev.slice(-2),
+        { id, tipo, texto, ...(accion ? { accion } : {}) },
+      ])
 
       if (duration > 0) {
         const timer = setTimeout(() => cerrar(id), duration)
@@ -113,7 +117,18 @@ function ToastView({
       className={`pointer-events-auto flex items-start gap-3 rounded-xl border p-3 shadow-lg shadow-black/30 ${tone.box}`}
     >
       <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${tone.iconClass}`} />
-      <p className="min-w-0 flex-1 text-sm text-ink">{toast.texto}</p>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm text-ink">{toast.texto}</p>
+        {toast.accion && (
+          <Link
+            to={toast.accion.href}
+            onClick={onClose}
+            className="mt-1 inline-block text-xs font-medium text-copper hover:underline"
+          >
+            {toast.accion.etiqueta}
+          </Link>
+        )}
+      </div>
       <button
         type="button"
         onClick={onClose}

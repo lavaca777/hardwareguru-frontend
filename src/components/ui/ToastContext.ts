@@ -2,10 +2,16 @@ import { createContext, useContext } from 'react'
 
 export type ToastTipo = 'ok' | 'warn' | 'error'
 
+export interface ToastAccion {
+  etiqueta: string
+  href: string
+}
+
 export interface ToastOpciones {
   tipo: ToastTipo
   texto: string
   duracionMs?: number
+  accion?: ToastAccion
 }
 
 export interface ToastItem extends ToastOpciones {
