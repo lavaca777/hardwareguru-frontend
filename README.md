@@ -41,7 +41,7 @@ Interfaz web de **HardwareGuru**: armador de PCs con validación de compatibilid
 
 ## Comunicación con el backend
 
-El frontend **solo habla con el API Gateway (BFF)**. El contrato completo está en `spec/constitution/api-contract.md`.
+El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con el gateway y se mantiene en el SDD local del frontend (no versionado).
 
 | Endpoint (BFF) | Uso |
 |---|---|
@@ -58,8 +58,34 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato completo está 
 ## Estado y datos
 
 - **Context + hooks**: auth, catálogo, armador, builds, alertas y chat. No se usa una librería de estado global.
-- **`localStorage`**: solo la sesión, bajo la clave `hg_session` (token + datos básicos del usuario). El riesgo de XSS está documentado en `spec/features/003-auth/spec.md`.
+- **`localStorage`**: solo la sesión, bajo la clave `hg_session` (token + datos básicos del usuario). El riesgo de XSS está documentado en el SDD local de auth.
 - **Mocks**: mientras el gateway no esté listo, `VITE_USE_MOCKS=true` sirve datos de `src/api/mocks/`.
+
+## Novedades para el equipo
+
+### Autenticación (003)
+
+- Las rutas privadas ahora exigen sesión; sin sesión redirigen a `/login`.
+- La sesión se guarda en `localStorage` bajo `hg_session`. Un `401` la limpia y muestra “Tu sesión expiró”.
+- Después del login se vuelve a la ruta protegida que se intentaba abrir.
+- En modo mock:
+  - cualquier correo válido + contraseña de 8 o más caracteres inicia sesión;
+  - `error@test.com` simula credenciales inválidas;
+  - `exists@test.com` simula un correo ya registrado al registrarse.
+
+### Catálogo (004)
+
+- `/components` consume `GET /componentes` y `GET /componentes/:id`.
+- `ComponentesProvider` carga el catálogo una sola vez por sesión y cachea los detalles.
+- La búsqueda ignora mayúsculas y acentos.
+- Filtros por tipo:
+  - CPU y placas: socket y fabricante;
+  - placas y RAM: tipo de RAM;
+  - fuentes: rango de potencia.
+- Incluye orden por nombre, TDP o potencia, estados de carga/vacío/error y detalle con especificaciones y benchmarks.
+- Los mocks ya cubren ambos endpoints si el gateway todavía no está listo.
+
+> El SDD (`spec/`) y `AGENT.md` son locales del frontend y están ignorados por git.
 
 ## Variables de entorno
 
@@ -104,6 +130,8 @@ npm run test:coverage  # una pasada + reporte de cobertura
 
 Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
+Estado actual: **140 tests** y **> 90% de cobertura** de líneas.
+
 ## Estructura
 
 ```
@@ -119,7 +147,7 @@ hardwareguru-frontend/
 │   ├── styles/         # index.css (entrada de Tailwind)
 │   ├── config.ts       # Constantes y banderas FEATURES
 │   └── main.tsx
-├── spec/               # SDD: constitución y features 001–011
+├── spec/               # SDD local (ignorado por git)
 ├── Dockerfile
 ├── vite.config.ts
 └── .github/workflows/ci.yml
@@ -130,7 +158,7 @@ hardwareguru-frontend/
 - [x] **001** Vite + React + TS, Tailwind, ruteo, cliente HTTP, config y mocks
 - [x] **002** Estructura común, navegación y componentes compartidos
 - [x] **003** Login, registro, sesión y rutas protegidas
-- [ ] **004** Catálogo de componentes con búsqueda, filtros y detalle
+- [x] **004** Catálogo de componentes con búsqueda, filtros y detalle
 - [ ] **005** Armador con selectores dependientes
 - [ ] **006** Simulación, explicación de problemas y guardado
 - [ ] **007** Mis builds: historial, detalle, abrir en armador y eliminar
