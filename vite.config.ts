@@ -20,6 +20,11 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: true,
+    env: {
+      VITE_USE_MOCKS: 'true',
+      VITE_API_URL: 'http://api.test',
+      VITE_MOCK_DELAY_MS: '0',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
