@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router'
-import { AppShell } from '@/components/AppShell'
+import { AppShellWithAlerts } from '@/components/AppShellWithAlerts'
 import { AuthLayout } from '@/components/AuthLayout'
+import { AlertsProvider } from '@/features/alerts/AlertsProvider'
 import { AccountPage } from '@/pages/AccountPage'
 import { AlertsPage } from '@/pages/AlertsPage'
 import { ComponentsPage } from '@/pages/ComponentsPage'
@@ -24,7 +25,13 @@ export function AppRouter() {
       </Route>
 
       <Route element={<ProtectedRoute />}>
-        <Route element={<AppShell />}>
+        <Route
+          element={
+            <AlertsProvider>
+              <AppShellWithAlerts />
+            </AlertsProvider>
+          }
+        >
           <Route path="/" element={<DashboardPage />} />
           <Route path="/builder" element={<PCBuilderPage />} />
           <Route path="/builds" element={<MyBuildsPage />} />
