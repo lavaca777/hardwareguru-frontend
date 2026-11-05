@@ -1,23 +1,41 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from '@/App'
+import { AuthProvider } from '@/auth/AuthProvider'
+import { saveSession } from '@/auth/session'
 import { AppRouter } from './AppRouter'
 
+const session = {
+  token: 'test-token',
+  user: { id: 'u1', email: 'a@b.com' },
+}
+
 beforeEach(() => {
+  localStorage.clear()
+  sessionStorage.clear()
   vi.stubEnv('VITE_USE_MOCKS', 'true')
   vi.stubEnv('VITE_API_URL', '')
 })
 
 afterEach(() => {
-  cleanup()
   vi.unstubAllEnvs()
 })
 
-const routes: Array<[string, string]> = [
+function renderApp(path: string, authenticated = false) {
+  if (authenticated) saveSession(session)
+
+  return render(
+    <MemoryRouter initialEntries={[path]}>
+      <AuthProvider>
+        <AppRouter />
+      </AuthProvider>
+    </MemoryRouter>,
+  )
+}
+
+const protectedRoutes: Array<[string, string]> = [
   ['/', 'Dashboard'],
-  ['/login', 'Iniciar sesión'],
-  ['/register', 'Crear cuenta'],
   ['/builder', 'Armar PC'],
   ['/builds', 'Mis builds'],
   ['/components', 'Componentes'],
@@ -26,24 +44,30 @@ const routes: Array<[string, string]> = [
 ]
 
 describe('rutas base', () => {
-  it.each(routes)('renderiza %s', (path, title) => {
-    render(
-      <MemoryRouter initialEntries={[path]}>
-        <AppRouter />
-      </MemoryRouter>,
-    )
+  it.each(protectedRoutes)(
+    'renderiza %s con sesión',
+    (path, title) => {
+      renderApp(path, true)
+
+      expect(
+        screen.getByRole('heading', { name: title }),
+      ).toBeInTheDocument()
+    },
+  )
+
+  it.each([
+    ['/login', 'Iniciar sesión'],
+    ['/register', 'Crear cuenta'],
+  ])('renderiza %s sin sesión', (path, title) => {
+    renderApp(path)
 
     expect(
       screen.getByRole('heading', { name: title }),
     ).toBeInTheDocument()
   })
 
-  it('renderiza la página 404', () => {
-    render(
-      <MemoryRouter initialEntries={['/ruta-inexistente']}>
-        <AppRouter />
-      </MemoryRouter>,
-    )
+  it('renderiza la página 404 con sesión', () => {
+    renderApp('/ruta-inexistente', true)
 
     expect(screen.getByRole('heading', { name: '404' })).toBeInTheDocument()
     expect(
@@ -51,7 +75,25 @@ describe('rutas base', () => {
     ).toHaveAttribute('href', '/')
   })
 
-  it('monta la app completa', () => {
+  it('redirige a login cuando no hay sesión', () => {
+    renderApp('/builder')
+
+    expect(
+      screen.getByRole('heading', { name: 'Iniciar sesión' }),
+    ).toBeInTheDocument()
+  })
+
+  it('redirige al dashboard si el usuario ya está autenticado', () => {
+    renderApp('/login', true)
+
+    expect(
+      screen.getByRole('heading', { name: 'Dashboard' }),
+    ).toBeInTheDocument()
+  })
+
+  it('monta la app completa con sesión', () => {
+    saveSession(session)
+
     render(
       <MemoryRouter initialEntries={['/']}>
         <App />

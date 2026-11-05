@@ -1,13 +1,17 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
+  SESSION_EXPIRED_KEY,
   SESSION_STORAGE_KEY,
   clearSession,
+  consumeSessionExpired,
+  markSessionExpired,
   readSession,
   saveSession,
 } from './session'
 
 beforeEach(() => {
   localStorage.clear()
+  sessionStorage.clear()
 })
 
 describe('session', () => {
@@ -44,5 +48,14 @@ describe('session', () => {
 
     expect(localStorage.getItem(SESSION_STORAGE_KEY)).toBeNull()
     expect(readSession()).toBeNull()
+  })
+
+  it('marca y consume el aviso de sesión expirada una sola vez', () => {
+    markSessionExpired()
+
+    expect(sessionStorage.getItem(SESSION_EXPIRED_KEY)).toBe('1')
+    expect(consumeSessionExpired()).toBe(true)
+    expect(sessionStorage.getItem(SESSION_EXPIRED_KEY)).toBeNull()
+    expect(consumeSessionExpired()).toBe(false)
   })
 })
