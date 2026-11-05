@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
@@ -106,5 +106,59 @@ describe('PCBuilderPage', () => {
     expect(
       await screen.findByText('Selección reiniciada.'),
     ).toBeInTheDocument()
+  })
+
+  it('simula, marca el resultado desactualizado y guarda la build', async () => {
+    const user = userEvent.setup()
+    renderPage('/builder?from=b1')
+
+    await screen.findByText('5 de 5 piezas')
+    await user.click(
+      screen.getByRole('button', { name: 'Simular rendimiento' }),
+    )
+
+    expect(await screen.findByText('Consumo estimado')).toBeInTheDocument()
+    expect(screen.getByText('216 W')).toBeInTheDocument()
+    expect(screen.getByText('Balanceado')).toBeInTheDocument()
+    expect(
+      await screen.findByText(/Tu build está balanceada/),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Guardar build' }),
+    ).toBeEnabled()
+
+    await user.click(screen.getByRole('tab', { name: '1440p' }))
+
+    expect(
+      await screen.findByText(/Resultado desactualizado/),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Guardar build' }),
+    ).toBeDisabled()
+
+    await user.click(
+      screen.getByRole('button', { name: 'Simular rendimiento' }),
+    )
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Guardar build' }),
+      ).toBeEnabled(),
+    )
+
+    await user.click(
+      screen.getByRole('button', { name: 'Guardar build' }),
+    )
+    const dialog = await screen.findByRole('dialog')
+    await user.type(within(dialog).getByLabelText('Nombre'), 'Mi build')
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Guardar' }),
+    )
+
+    expect(
+      await screen.findByText(/Build "Mi build" guardada/),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'Ver mis builds' }),
+    ).toHaveAttribute('href', '/builds')
   })
 })
