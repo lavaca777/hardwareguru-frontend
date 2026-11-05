@@ -17,6 +17,7 @@ import {
   UserIcon,
 } from '@/components/icons'
 import { USE_MOCKS } from '@/config'
+import { ComponentesProvider } from '@/features/components/ComponentesProvider'
 
 interface AppShellProps {
   alertCount?: number
@@ -283,7 +284,9 @@ export function AppShell({ alertCount = 0 }: AppShellProps) {
 
         <main id="main-content" className="flex-1 bg-blueprint">
           <div className="mx-auto w-full max-w-6xl px-4 py-6 lg:px-8 lg:py-8">
-            <Outlet />
+            <ComponentesProvider>
+              <Outlet />
+            </ComponentesProvider>
           </div>
         </main>
 
