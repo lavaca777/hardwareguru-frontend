@@ -18,7 +18,7 @@ import { catalogErrorMessage } from './errors'
 
 export function ComponentesProvider({ children }: { children: ReactNode }) {
   const [todos, setTodos] = useState<Componente[]>([])
-  const [cargando, setCargando] = useState(false)
+  const [cargando, setCargando] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const loadedRef = useRef(false)
   const loadingRef = useRef(false)

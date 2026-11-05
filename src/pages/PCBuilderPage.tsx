@@ -15,6 +15,7 @@ import {
 import { TYPE_LABELS } from '@/features/components/labels'
 import { FIELD_BY_TYPE } from '@/features/builder/rules'
 import { useBuilder } from '@/features/builder/useBuilder'
+import { notifyBuildsChanged } from '@/features/builds/events'
 import { SaveBuildModal } from '@/features/simulation/SaveBuildModal'
 import { ResultadosSimulacion } from '@/features/simulation/ResultadosSimulacion'
 import { getProblemMessage } from '@/features/simulation/mensajes'
@@ -407,6 +408,7 @@ export function PCBuilderPage() {
             onClose={() => setSaveOpen(false)}
             onSaved={(build) => {
               setSaveOpen(false)
+              notifyBuildsChanged()
               mostrar({
                 tipo: 'ok',
                 texto: `Build "${build.nombre}" guardada.`,
