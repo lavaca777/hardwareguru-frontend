@@ -85,6 +85,15 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 - Incluye orden por nombre, TDP o potencia, estados de carga/vacío/error y detalle con especificaciones y benchmarks.
 - Los mocks ya cubren ambos endpoints si el gateway todavía no está listo.
 
+### Armador (005)
+
+- `/builder` usa el catálogo compartido; no hay listas de compatibilidad hardcodeadas.
+- La selección y la resolución viven en `BuilderContext` y sobreviven a la navegación entre rutas privadas.
+- Placa y RAM se habilitan en cadena: CPU → placa → RAM.
+- Al cambiar una pieza base se conservan las selecciones compatibles; las incompatibles se limpian con un aviso.
+- `?from=<buildId>` precarga una build guardada desde `GET /builds`. Si no existe o le faltan piezas, se avisa.
+- La simulación y el guardado se conectan en la feature 006.
+
 > El SDD (`spec/`) y `AGENT.md` son locales del frontend y están ignorados por git.
 
 ## Variables de entorno
@@ -130,7 +139,7 @@ npm run test:coverage  # una pasada + reporte de cobertura
 
 Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
-Estado actual: **140 tests** y **> 90% de cobertura** de líneas.
+Estado actual: **155 tests** y **> 90% de cobertura** de líneas.
 
 ## Estructura
 
@@ -159,7 +168,7 @@ hardwareguru-frontend/
 - [x] **002** Estructura común, navegación y componentes compartidos
 - [x] **003** Login, registro, sesión y rutas protegidas
 - [x] **004** Catálogo de componentes con búsqueda, filtros y detalle
-- [ ] **005** Armador con selectores dependientes
+- [x] **005** Armador con selectores dependientes
 - [ ] **006** Simulación, explicación de problemas y guardado
 - [ ] **007** Mis builds: historial, detalle, abrir en armador y eliminar
 - [ ] **008** Alertas: página, contador y listado
