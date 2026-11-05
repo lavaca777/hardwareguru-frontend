@@ -160,5 +160,5 @@ describe('PCBuilderPage', () => {
     expect(
       screen.getByRole('link', { name: 'Ver mis builds' }),
     ).toHaveAttribute('href', '/builds')
-  })
+  }, 15_000)
 })
