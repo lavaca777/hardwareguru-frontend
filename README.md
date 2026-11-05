@@ -1,114 +1,143 @@
 # hardwareguru-frontend
 
-Interfaz web de **HardwareGuru**: armador de PCs con validación de compatibilidad, simulación de rendimiento y consumo, historial de builds, alertas energéticas y un asistente de IA ("Guru").
+Interfaz web de **HardwareGuru**: armador de PCs con validación de compatibilidad, simulación de rendimiento y consumo, catálogo de componentes, historial de builds, alertas energéticas, un asistente de IA ("Guru") y gestión de cuenta.
 
 > Proyecto universitario · Curso de Microservicios · Repo 6 de 7
 
 ## Tecnologías
 
-- React
-- React Router
-- Jest + React Testing Library
+- React 19 + Vite 8
+- TypeScript (modo `strict`)
+- React Router 7
+- Tailwind CSS 4
+- Vitest + React Testing Library
 - Docker + GitHub Actions
 
-> Estructura base, login y ruteo reciclados del proyecto anterior (TomatoAPI).
+> La base de ruteo y login se inspira en el proyecto anterior (TomatoAPI), adaptada a Vite + TypeScript. TomatoAPI usaba CRA/JavaScript, así que se reutiliza el flujo, no la configuración de build.
 
 ## Funcionalidades
 
 | Vista | Descripción |
 |---|---|
 | **Login / Registro** | Autenticación con JWT contra el API Gateway |
-| **Dashboard** | Banner de alertas críticas al iniciar sesión (origen: servicio .NET) |
+| **Dashboard** | Alertas pendientes, estadísticas de builds, builds recientes y accesos rápidos |
 | **Armador de PC ("Taller")** | Selectores dependientes: CPU → Placa → RAM, más GPU y Fuente |
-| **Resultados de simulación** | Consumo estimado, % de cuello de botella (1080p / 1440p) y estado (Balanceado / Riesgo / Incompatible) |
-| **Mis Builds** | Historial, detalle y eliminación de builds guardadas |
-| **Chat "Guru"** | Ventana flotante conectada al asistente de IA |
+| **Catálogo de componentes** | Tipos, buscador, filtros, orden y detalle con especificaciones y benchmarks |
+| **Resultados de simulación** | Consumo estimado, % de cuello de botella (1080p / 1440p), estado y explicación de problemas |
+| **Mis Builds** | Historial, detalle, abrir en el armador y eliminación |
+| **Alertas** | Alertas de builds guardadas, pendientes/leídas, contador en la navegación y marcado como leída |
+| **Chat "Guru"** | Chat conectado al asistente de IA |
+| **Mi cuenta** | Perfil, resumen de actividad, cierre de sesión y seguridad (condicional) |
 
 ### Lógica de selectores dependientes
 
 - Al elegir un CPU, la lista de placas madre se filtra por socket compatible (ej. AM5).
 - Al elegir una placa, la lista de RAM se filtra por tipo de memoria (ej. DDR5).
+- Las piezas incompatibles no se muestran; al cambiar una pieza base se conservan las selecciones válidas y se reinician las demás con un aviso.
+
+## Rutas
+
+`/login`, `/register`, `/` (dashboard), `/builder`, `/components`, `/builds`, `/alerts`, `/account` y `*` (404).
 
 ## Comunicación con el backend
 
-El frontend **solo habla con el API Gateway (BFF)**.
+El frontend **solo habla con el API Gateway (BFF)**. El contrato completo está en `spec/constitution/api-contract.md`.
 
 | Endpoint (BFF) | Uso |
 |---|---|
 | `POST /auth/login`, `POST /auth/register` | Autenticación |
-| `GET /componentes` | Alimentar los selectores |
+| `PATCH /auth/password`, `DELETE /auth/account` | Seguridad de la cuenta (condicionales) |
+| `GET /componentes`, `GET /componentes/:id` | Catálogo y detalle de piezas |
 | `POST /simular` | Simular rendimiento |
-| `POST /builds`, `GET /builds`, `DELETE /builds/{id}` | Gestión de builds |
-| `GET /alerts`, `PATCH /alerts/{id}/read` | Alertas del usuario |
+| `POST /builds`, `GET /builds`, `DELETE /builds/:id` | Gestión de builds |
+| `GET /alerts`, `PATCH /alerts/:id/read` | Alertas del usuario |
 | `POST /chat` | Chat con la IA |
 
 > Ajustar las rutas a las definitivas del `hardwareguru-api-gateway`.
 
+## Estado y datos
+
+- **Context + hooks**: auth, catálogo, armador, builds, alertas y chat. No se usa una librería de estado global.
+- **`localStorage`**: solo la sesión, bajo la clave `hg_session` (token + datos básicos del usuario). El riesgo de XSS está documentado en `spec/features/003-auth/spec.md`.
+- **Mocks**: mientras el gateway no esté listo, `VITE_USE_MOCKS=true` sirve datos de `src/api/mocks/`.
+
 ## Variables de entorno
 
-Crear un archivo `.env`:
+Crear un archivo `.env` a partir de `.env.example`:
 
 ```env
-REACT_APP_API_URL=http://localhost:<PUERTO_BFF>
+VITE_API_URL=http://localhost:<PUERTO_BFF>
+VITE_USE_MOCKS=true
+VITE_MOCK_DELAY_MS=400
 ```
 
-> Si usan Vite, el prefijo es `VITE_` en lugar de `REACT_APP_`.
+- `VITE_USE_MOCKS=true` usa `src/api/mocks/` en lugar del gateway real.
+- `VITE_MOCK_DELAY_MS` simula latencia para poder ver los estados de carga.
+- Vite solo expone al navegador las variables con prefijo `VITE_`. **Nunca** pongas secretos aquí.
+- No hardcodear URLs: siempre leer `import.meta.env.VITE_API_URL`.
 
 ## Cómo ejecutarlo
 
-**Requisitos:** Node.js 18+ y el API Gateway levantado (o un mock).
+**Requisitos:** Node.js 20.19+ (recomendado 22 LTS) y el API Gateway levantado (o los mocks activos).
 
 ```bash
 npm install
-npm start        # modo desarrollo
-npm run build    # build de producción
+npm run dev        # modo desarrollo en http://localhost:5173
+npm run build      # type-check + build de producción en dist/
+npm run preview    # sirve el build en http://localhost:4173
+npm run lint       # ESLint
 ```
 
 Con Docker:
 
 ```bash
 docker build -t hardwareguru-frontend .
-docker run -p 3000:80 hardwareguru-frontend
+docker run -p 8080:80 hardwareguru-frontend
 ```
 
 ## Tests
 
 ```bash
-npm test -- --coverage
+npm test               # modo watch
+npm run test:coverage  # una pasada + reporte de cobertura
 ```
 
-Meta: **≥ 60% de cobertura** (Jest + React Testing Library).
+Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
-## Estructura sugerida
+## Estructura
 
 ```
 hardwareguru-frontend/
 ├── src/
-│   ├── api/            # Cliente HTTP hacia el BFF
-│   ├── auth/           # Login, registro, contexto de sesión
-│   ├── components/     # Componentes reutilizables
-│   ├── pages/
-│   │   ├── Dashboard
-│   │   ├── PCBuilder
-│   │   ├── MyBuilds
-│   │   └── Login
-│   ├── features/
-│   │   ├── simulation/ # Panel de resultados
-│   │   ├── alerts/     # Banner / modal de alertas
-│   │   └── chat/       # Chat con Guru
-│   └── routes/
+│   ├── api/            # client.ts, index.ts (mock/real) y mocks tipados
+│   ├── auth/           # session.ts, contexto y hook de sesión
+│   ├── components/     # compartidos y ui/ (componentes base)
+│   ├── features/       # builder, simulation, builds, alerts, chat, components, dashboard
+│   ├── pages/          # Dashboard, PCBuilder, MyBuilds, Login...
+│   ├── routes/         # Rutas y ProtectedRoute
+│   ├── types/          # Tipos de dominio compartidos
+│   ├── styles/         # index.css (entrada de Tailwind)
+│   ├── config.ts       # Constantes y banderas FEATURES
+│   └── main.tsx
+├── spec/               # SDD: constitución y features 001–011
 ├── Dockerfile
+├── vite.config.ts
 └── .github/workflows/ci.yml
 ```
 
 ## Checklist de avance
 
-- [ ] Reciclar estructura, login y ruteo de TomatoAPI
-- [ ] Vista "Armador de PC" con selectores dependientes
-- [ ] Panel de resultados de simulación
-- [ ] Modal/banner de alertas al iniciar sesión
-- [ ] Vista "Mis Builds"
-- [ ] Chat interactivo con `/chat`
+- [ ] **001** Vite + React + TS, Tailwind, ruteo, cliente HTTP, config y mocks
+- [ ] **002** Estructura común, navegación y componentes compartidos
+- [ ] **003** Login, registro, sesión y rutas protegidas
+- [ ] **004** Catálogo de componentes con búsqueda, filtros y detalle
+- [ ] **005** Armador con selectores dependientes
+- [ ] **006** Simulación, explicación de problemas y guardado
+- [ ] **007** Mis builds: historial, detalle, abrir en armador y eliminar
+- [ ] **008** Alertas: página, contador y listado
+- [ ] **009** Dashboard con estadísticas y accesos rápidos
+- [ ] **010** Chat Guru
+- [ ] **011** Mi cuenta y seguridad
 - [ ] Tests con 60% de cobertura
 - [ ] Dockerfile
 - [ ] CI/CD (GitHub Actions)
