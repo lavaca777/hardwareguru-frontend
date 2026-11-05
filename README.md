@@ -116,6 +116,18 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 - Deep link: `/builds?open=<buildId>` abre directamente el detalle.
 - `BuildsProvider` comparte la lista con Dashboard y Alertas. Al guardar una build se dispara un evento para refrescarla.
 
+### Alertas (008)
+
+- `/alerts` muestra las alertas pendientes y leídas en pestañas con contador.
+- Cada alerta incluye build, mensaje, sugerencia, porcentaje de uso de la fuente y fecha.
+- **Ver build** abre `/builds?open=<buildId>`. Si la build fue eliminada, se reemplaza por “Esta build ya no existe”.
+- **Marcar como leída** ejecuta `PATCH /alerts/:id/read`, mueve la alerta a “Leídas” y baja el contador. Si falla, la alerta sigue pendiente y se muestra un aviso.
+- El contador de la navegación usa `AlertsProvider`, compartido con la página y el Dashboard.
+- Las alertas se consultan al entrar, al volver a la pestaña y cada 60 s mientras la pestaña está visible.
+- El polling y los listeners se limpian al desmontar el provider y al cerrar sesión.
+- Si el servicio de alertas falla, el resto de la app sigue funcionando; la página muestra el error con reintento.
+- `AlertCard` y `useAlerts` quedan disponibles para el Dashboard (009).
+
 > El SDD (`spec/`) y `AGENT.md` son locales del frontend y están ignorados por git.
 
 ## Variables de entorno
@@ -161,7 +173,7 @@ npm run test:coverage  # una pasada + reporte de cobertura
 
 Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
-Estado actual: **194 tests** y **> 90% de cobertura** de líneas.
+Estado actual: **216 tests** y **> 90% de cobertura** de líneas.
 
 ## Estructura
 
@@ -193,7 +205,7 @@ hardwareguru-frontend/
 - [x] **005** Armador con selectores dependientes
 - [x] **006** Simulación, explicación de problemas y guardado
 - [x] **007** Mis builds: historial, detalle, abrir en armador y eliminar
-- [ ] **008** Alertas: página, contador y listado
+- [x] **008** Alertas: página, contador y listado
 - [ ] **009** Dashboard con estadísticas y accesos rápidos
 - [ ] **010** Chat Guru
 - [ ] **011** Mi cuenta y seguridad
