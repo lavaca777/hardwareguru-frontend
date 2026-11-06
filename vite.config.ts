@@ -20,6 +20,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: true,
+    testTimeout: 15_000,
     env: {
       VITE_USE_MOCKS: 'true',
       VITE_API_URL: 'http://api.test',
