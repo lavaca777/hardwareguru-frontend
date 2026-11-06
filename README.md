@@ -204,6 +204,8 @@ npm run test:coverage  # una pasada + reporte de cobertura
 
 Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
+Los tests viven en carpetas `__tests__/` junto al módulo que prueban.
+
 Estado actual: **289 tests** y **> 90% de cobertura** de líneas.
 
 ## Estructura
