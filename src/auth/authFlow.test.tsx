@@ -91,7 +91,7 @@ describe('flujo de login', () => {
     await user.click(screen.getByRole('button', { name: 'Iniciar sesión' }))
 
     expect(
-      await screen.findByRole('heading', { name: 'Dashboard' }),
+      await screen.findByRole('heading', { name: 'Hola, a' }),
     ).toBeInTheDocument()
   })
 
@@ -207,7 +207,7 @@ describe('flujo de registro', () => {
     await user.click(screen.getByRole('button', { name: 'Crear cuenta' }))
 
     expect(
-      await screen.findByRole('heading', { name: 'Dashboard' }),
+      await screen.findByRole('heading', { name: 'Hola, nuevo' }),
     ).toBeInTheDocument()
   })
 })

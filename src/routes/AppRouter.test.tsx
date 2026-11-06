@@ -38,7 +38,7 @@ function renderApp(path: string, authenticated = false) {
 }
 
 const protectedRoutes: Array<[string, string]> = [
-  ['/', 'Dashboard'],
+  ['/', 'Hola, a'],
   ['/builder', 'Armar PC'],
   ['/builds', 'Mis builds'],
   ['/components', 'Componentes'],
@@ -90,7 +90,7 @@ describe('rutas base', () => {
     renderApp('/login', true)
 
     expect(
-      screen.getByRole('heading', { name: 'Dashboard' }),
+      screen.getByRole('heading', { name: 'Hola, a' }),
     ).toBeInTheDocument()
   })
 
@@ -104,7 +104,7 @@ describe('rutas base', () => {
     )
 
     expect(
-      screen.getByRole('heading', { name: 'Dashboard' }),
+      screen.getByRole('heading', { name: 'Hola, a' }),
     ).toBeInTheDocument()
   })
 
