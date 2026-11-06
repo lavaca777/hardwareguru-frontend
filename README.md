@@ -128,6 +128,21 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 - Si el servicio de alertas falla, el resto de la app sigue funcionando; la página muestra el error con reintento.
 - `AlertCard` y `useAlerts` quedan disponibles para el Dashboard (009).
 
+### Dashboard (009)
+
+- `/` saluda con la parte local del correo y ofrece **Armar nuevo PC** y **Preguntar a Guru**.
+- **Preguntar a Guru** emite el evento `hardwareguru:open-chat`; la ventana del chat se monta en 010.
+- Muestra un resumen de alertas pendientes con enlace a `/alerts`; si no hay alertas, la sección no aparece.
+- El resumen incluye builds guardadas, consumo promedio y cuello de botella promedio.
+- **Estado de tus builds** distribuye balanceadas, en riesgo e incompatibles.
+- **Consumo por build** compara consumo contra la fuente, con referencia visual al 85% y hasta 6 builds recientes.
+- **Tu mejor build** elige la de menor cuello entre las balanceadas y desempata por menor consumo.
+- **Pieza favorita** cuenta CPUs y GPUs repetidas; si no hay repeticiones, muestra el mensaje alterno.
+- **Builds recientes** lista las 4 últimas con enlace a `Mis builds`.
+- **Consejo de Guru** sale del banco `GURU_TIPS` de `config.ts` y evita repetir el inmediatamente anterior.
+- Sin builds se muestra la bienvenida **Arma tu primer PC** y se ocultan las secciones de estadísticas.
+- Los cálculos viven en `calcularEstadisticas` (`features/dashboard/stats.ts`); no se añadieron librerías de gráficos.
+
 > El SDD (`spec/`) y `AGENT.md` son locales del frontend y están ignorados por git.
 
 ## Variables de entorno
@@ -173,7 +188,7 @@ npm run test:coverage  # una pasada + reporte de cobertura
 
 Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
-Estado actual: **216 tests** y **> 90% de cobertura** de líneas.
+Estado actual: **250 tests** y **> 90% de cobertura** de líneas.
 
 ## Estructura
 
@@ -206,7 +221,7 @@ hardwareguru-frontend/
 - [x] **006** Simulación, explicación de problemas y guardado
 - [x] **007** Mis builds: historial, detalle, abrir en armador y eliminar
 - [x] **008** Alertas: página, contador y listado
-- [ ] **009** Dashboard con estadísticas y accesos rápidos
+- [x] **009** Dashboard con estadísticas y accesos rápidos
 - [ ] **010** Chat Guru
 - [ ] **011** Mi cuenta y seguridad
 - [ ] Tests con 60% de cobertura
