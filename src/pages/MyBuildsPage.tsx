@@ -175,7 +175,7 @@ export function MyBuildsPage() {
 
       {!error && builds.length > 0 && (
         <>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <SearchInput
               className="sm:col-span-2"
               label="Buscar builds"

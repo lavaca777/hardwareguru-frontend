@@ -156,6 +156,8 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 ### Ajustes de interfaz
 
 - El sidebar de escritorio queda fijo al alto de la ventana con `sticky`, aunque la página crezca. Si el menú no cabe, solo la navegación tiene scroll interno.
+- El icono de lupa de `SearchInput` se centra respecto al alto del input, no respecto a la celda del grid que puede estirarse con otros filtros.
+- En las barras de filtros, la búsqueda y los selectores se alinean por la base para que las tres cajas queden a la misma altura en escritorio.
 
 > El SDD (`spec/`) y `AGENT.md` son locales del frontend y están ignorados por git.
 

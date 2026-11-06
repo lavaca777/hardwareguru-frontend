@@ -307,7 +307,7 @@ export function ComponentsPage() {
             label="Tipos de componente"
           />
 
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-4 grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <SearchInput
               className="sm:col-span-2"
               label="Buscar componentes"
