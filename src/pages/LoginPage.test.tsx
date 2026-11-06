@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ACCOUNT_DELETED_KEY } from '@/auth/session'
 import { LoginPage } from './LoginPage'
 
 const { loginMock } = vi.hoisted(() => ({
@@ -48,5 +49,18 @@ describe('LoginPage', () => {
     fireEvent.submit(form as HTMLFormElement)
 
     expect(loginMock).toHaveBeenCalledOnce()
+  })
+
+  it('muestra el aviso de cuenta eliminada una sola vez', () => {
+    sessionStorage.setItem(ACCOUNT_DELETED_KEY, '1')
+
+    render(
+      <MemoryRouter>
+        <LoginPage />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Tu cuenta fue eliminada')).toBeInTheDocument()
+    expect(sessionStorage.getItem(ACCOUNT_DELETED_KEY)).toBeNull()
   })
 })

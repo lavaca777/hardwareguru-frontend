@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { login, register } from './auth'
+import {
+  cambiarPassword,
+  eliminarCuenta,
+  login,
+  register,
+} from './auth'
 import { listarAlertas, marcarLeida, resetMockAlerts } from './alertas'
 import { enviarMensaje } from './chat'
 import { listarComponentes, obtenerComponente } from './componentes'
@@ -190,6 +195,25 @@ describe('mocks de auth y chat', () => {
     await expect(
       register('exists@test.com', '12345678'),
     ).rejects.toMatchObject({ status: 409, code: 'EMAIL_EXISTS' })
+  })
+
+  it('cambia la contraseña y valida la actual', async () => {
+    await expect(
+      cambiarPassword('actual', 'nueva1234'),
+    ).resolves.toBeUndefined()
+    await expect(
+      cambiarPassword('incorrecta', 'nueva1234'),
+    ).rejects.toMatchObject({
+      status: 401,
+      code: 'INVALID_CREDENTIALS',
+    })
+    await expect(
+      cambiarPassword('igual', 'igual'),
+    ).rejects.toMatchObject({ status: 400, code: 'VALIDATION' })
+  })
+
+  it('elimina la cuenta', async () => {
+    await expect(eliminarCuenta()).resolves.toBeUndefined()
   })
 
   it('responde según el mensaje del chat', async () => {

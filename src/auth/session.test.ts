@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import {
+  ACCOUNT_DELETED_KEY,
   SESSION_EXPIRED_KEY,
   SESSION_STORAGE_KEY,
   clearSession,
+  consumeAccountDeleted,
   consumeSessionExpired,
+  markAccountDeleted,
   markSessionExpired,
   readSession,
   saveSession,
@@ -57,5 +60,14 @@ describe('session', () => {
     expect(consumeSessionExpired()).toBe(true)
     expect(sessionStorage.getItem(SESSION_EXPIRED_KEY)).toBeNull()
     expect(consumeSessionExpired()).toBe(false)
+  })
+
+  it('marca y consume el aviso de cuenta eliminada una sola vez', () => {
+    markAccountDeleted()
+
+    expect(sessionStorage.getItem(ACCOUNT_DELETED_KEY)).toBe('1')
+    expect(consumeAccountDeleted()).toBe(true)
+    expect(sessionStorage.getItem(ACCOUNT_DELETED_KEY)).toBeNull()
+    expect(consumeAccountDeleted()).toBe(false)
   })
 })

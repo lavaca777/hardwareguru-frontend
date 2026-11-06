@@ -43,6 +43,17 @@ describe('api real', () => {
     })
   })
 
+  it('gestiona la seguridad de la cuenta', async () => {
+    await real.cambiarPassword('vieja', 'nueva1234')
+    await real.eliminarCuenta()
+
+    expect(patch).toHaveBeenCalledWith('/auth/password', {
+      actual: 'vieja',
+      nueva: 'nueva1234',
+    })
+    expect(remove).toHaveBeenCalledWith('/auth/account')
+  })
+
   it('lista componentes con y sin tipo', async () => {
     await real.listarComponentes()
     await real.listarComponentes('cpu')
