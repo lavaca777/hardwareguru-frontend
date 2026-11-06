@@ -2,6 +2,7 @@ import type { Session } from '@/types'
 
 export const SESSION_STORAGE_KEY = 'hg_session'
 export const SESSION_EXPIRED_KEY = 'hg_session_expired'
+export const ACCOUNT_DELETED_KEY = 'hg_account_deleted'
 
 export function readSession(): Session | null {
   try {
@@ -36,6 +37,24 @@ export function consumeSessionExpired(): boolean {
     const expired = sessionStorage.getItem(SESSION_EXPIRED_KEY) === '1'
     if (expired) sessionStorage.removeItem(SESSION_EXPIRED_KEY)
     return expired
+  } catch {
+    return false
+  }
+}
+
+export function markAccountDeleted(): void {
+  try {
+    sessionStorage.setItem(ACCOUNT_DELETED_KEY, '1')
+  } catch {
+    // sessionStorage can be unavailable in restricted browser contexts
+  }
+}
+
+export function consumeAccountDeleted(): boolean {
+  try {
+    const deleted = sessionStorage.getItem(ACCOUNT_DELETED_KEY) === '1'
+    if (deleted) sessionStorage.removeItem(ACCOUNT_DELETED_KEY)
+    return deleted
   } catch {
     return false
   }

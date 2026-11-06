@@ -3,7 +3,10 @@ import { Link, useLocation, useNavigate } from 'react-router'
 import { authErrorMessage } from '@/auth/errors'
 import { useAuth } from '@/auth/useAuth'
 import { safeRedirect } from '@/auth/redirect'
-import { consumeSessionExpired } from '@/auth/session'
+import {
+  consumeAccountDeleted,
+  consumeSessionExpired,
+} from '@/auth/session'
 import {
   hasFieldErrors,
   validateEmail,
@@ -24,6 +27,7 @@ export function LoginPage() {
   const [formError, setFormError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [expired] = useState(consumeSessionExpired)
+  const [accountDeleted] = useState(consumeAccountDeleted)
 
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
@@ -82,6 +86,11 @@ export function LoginPage() {
         {expired && (
           <ProblemNotice tono="info" titulo="Tu sesión expiró">
             Inicia sesión de nuevo para continuar.
+          </ProblemNotice>
+        )}
+        {accountDeleted && (
+          <ProblemNotice tono="info" titulo="Tu cuenta fue eliminada">
+            Puedes crear una cuenta nueva cuando quieras.
           </ProblemNotice>
         )}
         {formError && (

@@ -36,6 +36,33 @@ export async function register(
   return createSession(email)
 }
 
+export async function cambiarPassword(
+  actual: string,
+  nueva: string,
+): Promise<void> {
+  await mockDelay()
+
+  if (actual.trim().toLowerCase() === 'incorrecta') {
+    throw new ApiError(
+      401,
+      'INVALID_CREDENTIALS',
+      'La contraseña actual no es correcta.',
+    )
+  }
+
+  if (nueva === actual) {
+    throw new ApiError(
+      400,
+      'VALIDATION',
+      'Elige una contraseña distinta.',
+    )
+  }
+}
+
+export async function eliminarCuenta(): Promise<void> {
+  await mockDelay()
+}
+
 function createSession(email: string): Session {
   return {
     token: `mock-token-${email.toLowerCase()}`,
