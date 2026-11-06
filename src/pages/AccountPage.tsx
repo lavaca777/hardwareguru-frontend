@@ -1,34 +1,95 @@
+import { api } from '@/api'
 import { useAuth } from '@/auth/useAuth'
+import { markAccountDeleted } from '@/auth/session'
 import { PageHeader } from '@/components/PageHeader'
 import { Button, Card } from '@/components/ui'
+import { FEATURES } from '@/config'
+import { ActivitySummary } from '@/features/account/ActivitySummary'
+import { ChangePasswordCard } from '@/features/account/ChangePasswordCard'
+import { DeleteAccountCard } from '@/features/account/DeleteAccountCard'
+import { ProfileCard } from '@/features/account/ProfileCard'
+import { useAlerts } from '@/features/alerts/alertsContext'
+import { useBuilds } from '@/features/builds/buildsContext'
 
-export function AccountPage() {
+export interface AccountFeatures {
+  cambiarPassword: boolean
+  eliminarCuenta: boolean
+}
+
+interface AccountPageProps {
+  features?: AccountFeatures
+}
+
+export function AccountPage({
+  features = FEATURES,
+}: AccountPageProps = {}) {
   const { user, logout } = useAuth()
+  const {
+    builds,
+    cargando: buildsCargando,
+    error: buildsError,
+    recargar: recargarBuilds,
+  } = useBuilds()
+  const {
+    pendientes,
+    cargando: alertasCargando,
+    error: alertasError,
+    recargar: recargarAlertas,
+  } = useAlerts()
+
+  const cargandoActividad = buildsCargando || alertasCargando
+  const errorActividad = buildsError ?? alertasError
+
+  const reintentarActividad = () => {
+    if (buildsError) recargarBuilds()
+    if (alertasError) recargarAlertas()
+  }
 
   return (
     <section>
       <PageHeader
         title="Mi cuenta"
-        description="Perfil, sesión y seguridad."
+        description="Perfil, actividad y seguridad de tu sesión."
       />
 
-      <Card className="max-w-xl p-6">
-        <p className="text-xs text-muted">Sesión iniciada como</p>
-        <p className="mt-1 text-sm font-medium text-ink">
-          {user?.email ?? '—'}
-        </p>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={logout}>
-            Cerrar sesión
-          </Button>
+      <div className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
+        <div className="space-y-4">
+          <ProfileCard user={user} />
+          <ActivitySummary
+            builds={builds.length}
+            pendientes={pendientes.length}
+            cargando={cargandoActividad}
+            error={errorActividad}
+            onReintentar={reintentarActividad}
+          />
         </div>
 
-        <p className="mt-4 text-xs text-muted">
-          La gestión completa de la cuenta se implementa en la feature
-          011-account.
-        </p>
-      </Card>
+        <div className="space-y-4">
+          <Card className="p-5">
+            <h2 className="text-sm font-semibold text-ink">Sesión</h2>
+            <p className="mt-1 text-xs text-muted">
+              Cierra sesión en este dispositivo. Se borrarán los datos en
+              memoria.
+            </p>
+            <Button variant="secondary" className="mt-4" onClick={logout}>
+              Cerrar sesión
+            </Button>
+          </Card>
+
+          {features.cambiarPassword && <ChangePasswordCard />}
+
+          {features.eliminarCuenta && user && (
+            <DeleteAccountCard
+              email={user.email}
+              onEliminar={api.eliminarCuenta}
+              onEliminada={() => {
+                markAccountDeleted()
+                logout()
+              }}
+            />
+          )}
+        </div>
+      </div>
     </section>
   )
 }

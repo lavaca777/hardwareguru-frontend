@@ -143,6 +143,16 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 - Sin builds se muestra la bienvenida **Arma tu primer PC** y se ocultan las secciones de estadísticas.
 - Los cálculos viven en `calcularEstadisticas` (`features/dashboard/stats.ts`); no se añadieron librerías de gráficos.
 
+### Mi cuenta (011)
+
+- `/account` muestra correo, inicial del usuario y **Miembro desde** cuando el backend envía `creadoEn`.
+- El resumen de actividad reutiliza `useBuilds()` y `useAlerts()`: builds guardadas, alertas pendientes y enlaces a sus páginas.
+- **Cerrar sesión** limpia la sesión y los datos en memoria, y vuelve a `/login`.
+- **Cambiar contraseña** y **Eliminar cuenta** están implementados, pero ocultos por defecto con `FEATURES.cambiarPassword` y `FEATURES.eliminarCuenta` hasta confirmar los endpoints del BFF. Para mostrarlos en desarrollo, cambiar ambas banderas a `true` en `src/config.ts`.
+- Cambiar contraseña valida actual, nueva y confirmación; una nueva igual a la actual se rechaza y un `401` muestra “La contraseña actual no es correcta”.
+- Eliminar cuenta exige escribir el correo exacto; evita dobles envíos y, al terminar, cierra sesión y muestra “Tu cuenta fue eliminada” en login.
+- En mocks, usar `incorrecta` como contraseña actual simula el `401`; el resto de cambios y la eliminación se resuelven correctamente.
+
 > El SDD (`spec/`) y `AGENT.md` son locales del frontend y están ignorados por git.
 
 ## Variables de entorno
@@ -188,7 +198,7 @@ npm run test:coverage  # una pasada + reporte de cobertura
 
 Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
-Estado actual: **250 tests** y **> 90% de cobertura** de líneas.
+Estado actual: **289 tests** y **> 90% de cobertura** de líneas.
 
 ## Estructura
 
@@ -223,8 +233,8 @@ hardwareguru-frontend/
 - [x] **008** Alertas: página, contador y listado
 - [x] **009** Dashboard con estadísticas y accesos rápidos
 - [ ] **010** Chat Guru
-- [ ] **011** Mi cuenta y seguridad
-- [ ] Tests con 60% de cobertura
+- [x] **011** Mi cuenta y seguridad
+- [x] Tests con 60% de cobertura
 - [ ] Dockerfile
 - [ ] CI/CD (GitHub Actions)
 
