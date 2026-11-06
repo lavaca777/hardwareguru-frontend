@@ -227,13 +227,13 @@ export function AppShell({ alertCount = 0 }: AppShellProps) {
         Saltar al contenido
       </a>
       <div className="min-h-screen bg-bg text-ink lg:grid lg:grid-cols-[240px_1fr]">
-        <aside className="hidden border-r border-line bg-panel/70 lg:flex lg:min-h-screen lg:flex-col">
+        <aside className="hidden border-r border-line bg-panel/70 lg:sticky lg:top-0 lg:flex lg:h-screen lg:self-start lg:flex-col">
         <div className="border-b border-line px-4 py-5">
           <Brand />
         </div>
         <nav
           aria-label="Navegación principal"
-          className="relative flex-1 px-3 py-4"
+          className="relative min-h-0 flex-1 overflow-y-auto px-3 py-4"
         >
           <span
             className="pointer-events-none absolute bottom-6 left-[1.85rem] top-6 w-px bg-line"

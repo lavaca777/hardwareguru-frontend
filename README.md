@@ -153,6 +153,10 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 - Eliminar cuenta exige escribir el correo exacto; evita dobles envíos y, al terminar, cierra sesión y muestra “Tu cuenta fue eliminada” en login.
 - En mocks, usar `incorrecta` como contraseña actual simula el `401`; el resto de cambios y la eliminación se resuelven correctamente.
 
+### Ajustes de interfaz
+
+- El sidebar de escritorio queda fijo al alto de la ventana con `sticky`, aunque la página crezca. Si el menú no cabe, solo la navegación tiene scroll interno.
+
 > El SDD (`spec/`) y `AGENT.md` son locales del frontend y están ignorados por git.
 
 ## Variables de entorno
