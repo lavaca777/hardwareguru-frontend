@@ -58,6 +58,22 @@ describe('rutas base', () => {
     },
   )
 
+  it('muestra el chat en rutas privadas y no en login', () => {
+    const { unmount } = renderApp('/builder', true)
+
+    expect(
+      screen.getByRole('button', { name: 'Abrir chat de Guru' }),
+    ).toBeInTheDocument()
+
+    unmount()
+    localStorage.clear()
+    renderApp('/login')
+
+    expect(
+      screen.queryByRole('button', { name: 'Abrir chat de Guru' }),
+    ).not.toBeInTheDocument()
+  })
+
   it.each([
     ['/login', 'Iniciar sesión'],
     ['/register', 'Crear cuenta'],

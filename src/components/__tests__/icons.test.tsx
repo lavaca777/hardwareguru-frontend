@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   AlertTriangleIcon,
   BellIcon,
+  ChatIcon,
   CheckIcon,
   ChevronDownIcon,
   CloseIcon,
@@ -13,6 +14,7 @@ import {
   MenuIcon,
   ReloadIcon,
   SearchIcon,
+  SendIcon,
   StackIcon,
   UserIcon,
 } from '../icons'
@@ -20,6 +22,7 @@ import {
 const icons = {
   AlertTriangleIcon,
   BellIcon,
+  ChatIcon,
   CheckIcon,
   ChevronDownIcon,
   CloseIcon,
@@ -30,6 +33,7 @@ const icons = {
   MenuIcon,
   ReloadIcon,
   SearchIcon,
+  SendIcon,
   StackIcon,
   UserIcon,
 }
