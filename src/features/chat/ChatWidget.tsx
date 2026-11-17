@@ -107,7 +107,7 @@ export function ChatWidget() {
               ? 'Abrir chat de Guru, hay una respuesta nueva'
               : 'Abrir chat de Guru'
           }
-          className="fixed bottom-4 right-4 z-40 flex h-12 items-center gap-2 rounded-full border border-copper/50 bg-copper px-4 text-sm font-medium text-[#1a100b] shadow-lg shadow-black/40 transition-colors hover:bg-[#e39465] relative"
+          className="fixed bottom-4 right-4 z-40 flex h-12 items-center gap-2 rounded-full border border-copper/50 bg-copper px-4 text-sm font-medium text-[#1a100b] shadow-lg shadow-black/40 transition-colors hover:bg-[#e39465]"
         >
           <ChatIcon className="h-5 w-5" />
           <span className="hidden sm:inline">Guru</span>

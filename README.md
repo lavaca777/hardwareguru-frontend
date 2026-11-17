@@ -172,6 +172,7 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 - El sidebar de escritorio queda fijo al alto de la ventana con `sticky`, aunque la página crezca. Si el menú no cabe, solo la navegación tiene scroll interno.
 - El icono de lupa de `SearchInput` se centra respecto al alto del input, no respecto a la celda del grid que puede estirarse con otros filtros.
 - En las barras de filtros, la búsqueda y los selectores se alinean por la base para que las tres cajas queden a la misma altura en escritorio.
+- El acceso flotante de Guru queda fijo abajo a la derecha, visible aunque la página sea larga.
 
 > El SDD (`spec/`) y `AGENT.md` son locales del frontend y están ignorados por git.
 
@@ -220,7 +221,7 @@ Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
 Los tests viven en carpetas `__tests__/` junto al módulo que prueban.
 
-Estado actual: **315 tests** y **> 90% de cobertura** de líneas.
+Estado actual: **316 tests** y **> 90% de cobertura** de líneas.
 
 ## Estructura
 

@@ -51,6 +51,19 @@ beforeEach(() => {
 })
 
 describe('ChatWidget', () => {
+  it('mantiene el acceso fijo en la esquina inferior derecha', () => {
+    renderChat()
+
+    const acceso = screen.getByRole('button', {
+      name: 'Abrir chat de Guru',
+    })
+
+    expect(acceso).toHaveClass('fixed')
+    expect(acceso).toHaveClass('bottom-4')
+    expect(acceso).toHaveClass('right-4')
+    expect(acceso).not.toHaveClass('relative')
+  })
+
   it('abre la ventana y muestra bienvenida y sugerencias', async () => {
     const user = await abrirChat()
 
