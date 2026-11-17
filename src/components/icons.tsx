@@ -143,3 +143,21 @@ export function ReloadIcon(props: IconProps) {
     </Icon>
   )
 }
+
+export function ChatIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M20 4H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h4v4l4-4h8a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1Z" />
+      <path d="M7 8h10M7 11.5h6" />
+    </Icon>
+  )
+}
+
+export function SendIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="m21 3-7.5 18-3.5-7-7-3.5L21 3Z" />
+      <path d="m10 11 4-4" />
+    </Icon>
+  )
+}

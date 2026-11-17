@@ -2,6 +2,8 @@ import { Route, Routes } from 'react-router'
 import { AppShellWithAlerts } from '@/components/AppShellWithAlerts'
 import { AuthLayout } from '@/components/AuthLayout'
 import { AlertsProvider } from '@/features/alerts/AlertsProvider'
+import { ChatProvider } from '@/features/chat/ChatProvider'
+import { ChatWidget } from '@/features/chat/ChatWidget'
 import { AccountPage } from '@/pages/AccountPage'
 import { AlertsPage } from '@/pages/AlertsPage'
 import { ComponentsPage } from '@/pages/ComponentsPage'
@@ -27,9 +29,12 @@ export function AppRouter() {
       <Route element={<ProtectedRoute />}>
         <Route
           element={
-            <AlertsProvider>
-              <AppShellWithAlerts />
-            </AlertsProvider>
+            <ChatProvider>
+              <AlertsProvider>
+                <AppShellWithAlerts />
+              </AlertsProvider>
+              <ChatWidget />
+            </ChatProvider>
           }
         >
           <Route path="/" element={<DashboardPage />} />

@@ -143,6 +143,20 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 - Sin builds se muestra la bienvenida **Arma tu primer PC** y se ocultan las secciones de estadísticas.
 - Los cálculos viven en `calcularEstadisticas` (`features/dashboard/stats.ts`); no se añadieron librerías de gráficos.
 
+### Chat Guru (010)
+
+- Botón flotante **Guru** visible en todas las rutas privadas, nunca en login/registro.
+- La ventana no es un modal: se puede minimizar y no bloquea la página de fondo. `Esc` la cierra.
+- Bienvenida con tres sugerencias que se envían al pulsarlas; desaparecen al iniciar la conversación.
+- Historial en `ChatContext` durante la sesión: sobrevive a la navegación y se borra al cerrar sesión.
+- `Enter` envía y `Shift+Enter` inserta un salto de línea.
+- Límite de 1000 caracteres con contador desde 900.
+- Mientras Guru responde se muestra **“Guru está escribiendo…”** y se bloquea el envío.
+- Errores de IA/red y respuestas vacías generan un mensaje de sistema con **Reintentar**.
+- **Nueva conversación** pide confirmación solo si ya hay mensajes.
+- El acceso rápido **Preguntar a Guru** del Dashboard abre la ventana mediante `hardwareguru:open-chat`.
+- Contrato actual: `POST /chat` con `{ mensaje, historial }`. Para modo real, el gateway debe adaptarlo al MCP (`{ prompt }` + `x-user-id`).
+
 ### Mi cuenta (011)
 
 - `/account` muestra correo, inicial del usuario y **Miembro desde** cuando el backend envía `creadoEn`.
@@ -206,7 +220,7 @@ Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
 Los tests viven en carpetas `__tests__/` junto al módulo que prueban.
 
-Estado actual: **289 tests** y **> 90% de cobertura** de líneas.
+Estado actual: **315 tests** y **> 90% de cobertura** de líneas.
 
 ## Estructura
 
@@ -240,7 +254,7 @@ hardwareguru-frontend/
 - [x] **007** Mis builds: historial, detalle, abrir en armador y eliminar
 - [x] **008** Alertas: página, contador y listado
 - [x] **009** Dashboard con estadísticas y accesos rápidos
-- [ ] **010** Chat Guru
+- [x] **010** Chat Guru
 - [x] **011** Mi cuenta y seguridad
 - [x] Tests con 60% de cobertura
 - [ ] Dockerfile
