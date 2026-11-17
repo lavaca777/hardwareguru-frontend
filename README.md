@@ -50,6 +50,25 @@ VITE_USE_MOCKS=false
 
 El cliente agrega `Authorization: Bearer <token>` automáticamente a todas las peticiones privadas. Para volver a la demo con datos locales, usar `VITE_USE_MOCKS=true`.
 
+### Integración incremental: catálogo primero
+
+Mientras auth, simulación, builds, alertas y chat todavía no estén expuestos por el gateway, se puede conectar **solo el catálogo real** manteniendo el resto en mocks:
+
+```env
+VITE_API_URL=http://localhost:3000/api
+VITE_USE_MOCKS=true
+VITE_REAL_CATALOG=true
+VITE_MOCK_DELAY_MS=0
+```
+
+Con esto:
+
+- el login y el resto de la app siguen usando mocks;
+- `/components` usa `GET /api/componentes` y `GET /api/componentes/:id` del gateway;
+- el frontend tolera que el gateway entregue `tipo_ram`/`potencia_w` y los normaliza a `tipoRam`/`potenciaW`.
+
+Hay que reiniciar Vite después de cambiar las variables. Antes deben estar arriba el PostgreSQL del catálogo, el servidor gRPC del catálogo y el gateway en `localhost:3000`. Cuando auth y el resto de endpoints estén listos, se cambia a `VITE_USE_MOCKS=false` y `VITE_REAL_CATALOG=false`.
+
 | Endpoint (BFF) | Uso |
 |---|---|
 | `POST /auth/login`, `POST /auth/register` | Autenticación |
@@ -190,10 +209,12 @@ Crear un archivo `.env` a partir de `.env.example`:
 ```env
 VITE_API_URL=http://localhost:3000/api
 VITE_USE_MOCKS=true
+VITE_REAL_CATALOG=false
 VITE_MOCK_DELAY_MS=400
 ```
 
 - `VITE_USE_MOCKS=true` usa `src/api/mocks/` en lugar del gateway real.
+- `VITE_REAL_CATALOG=true` usa el gateway real solo para catálogo, manteniendo auth y el resto en mocks.
 - `VITE_MOCK_DELAY_MS` simula latencia para poder ver los estados de carga.
 - Vite solo expone al navegador las variables con prefijo `VITE_`. **Nunca** pongas secretos aquí.
 - No hardcodear URLs: siempre leer `import.meta.env.VITE_API_URL`.
@@ -249,7 +270,7 @@ Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
 Los tests viven en carpetas `__tests__/` junto al módulo que prueban.
 
-Estado actual: **316 tests** y **> 90% de cobertura** de líneas.
+Estado actual: **319 tests** y **> 90% de cobertura** de líneas.
 
 ## Estructura
 

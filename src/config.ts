@@ -23,6 +23,8 @@ export const FEATURES = {
 } as const
 
 export const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true'
+export const USE_REAL_CATALOG =
+  import.meta.env.VITE_REAL_CATALOG === 'true'
 
 const parsedMockDelay = Number(import.meta.env.VITE_MOCK_DELAY_MS ?? 400)
 export const MOCK_DELAY_MS = Number.isFinite(parsedMockDelay)
