@@ -41,7 +41,14 @@ Interfaz web de **HardwareGuru**: armador de PCs con validación de compatibilid
 
 ## Comunicación con el backend
 
-El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con el gateway y se mantiene en el SDD local del frontend (no versionado).
+El frontend **solo habla con el API Gateway (BFF)**. El gateway expone todo bajo el prefijo `/api`, por lo que la URL base real debe incluir ese prefijo:
+
+```env
+VITE_API_URL=http://localhost:3000/api
+VITE_USE_MOCKS=false
+```
+
+El cliente agrega `Authorization: Bearer <token>` automáticamente a todas las peticiones privadas. Para volver a la demo con datos locales, usar `VITE_USE_MOCKS=true`.
 
 | Endpoint (BFF) | Uso |
 |---|---|
@@ -181,7 +188,7 @@ El frontend **solo habla con el API Gateway (BFF)**. El contrato se coordina con
 Crear un archivo `.env` a partir de `.env.example`:
 
 ```env
-VITE_API_URL=http://localhost:<PUERTO_BFF>
+VITE_API_URL=http://localhost:3000/api
 VITE_USE_MOCKS=true
 VITE_MOCK_DELAY_MS=400
 ```
