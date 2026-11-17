@@ -207,8 +207,29 @@ Con Docker:
 
 ```bash
 docker build -t hardwareguru-frontend .
-docker run -p 8080:80 hardwareguru-frontend
+docker run --rm -p 8080:80 hardwareguru-frontend
 ```
+
+La imagen usa Nginx, sirve el SPA con fallback a `index.html` y expone `/healthz`. Por defecto se construye en modo mock (`VITE_USE_MOCKS=true`). Para apuntar al gateway real:
+
+```bash
+docker build \
+  --build-arg VITE_USE_MOCKS=false \
+  --build-arg VITE_API_URL=http://localhost:3000/api \
+  -t hardwareguru-frontend:real .
+```
+
+> Las variables `VITE_*` se embeben en el build; no se leen en tiempo de ejecución del contenedor.
+
+### CI/CD
+
+El workflow `.github/workflows/ci.yml` ejecuta:
+
+- `npm ci`
+- `npm run lint`
+- `npm run test:coverage`
+- `npm run build`
+- build de la imagen Docker y smoke test de `/healthz` y del HTML servido.
 
 ## Tests
 
@@ -258,8 +279,8 @@ hardwareguru-frontend/
 - [x] **010** Chat Guru
 - [x] **011** Mi cuenta y seguridad
 - [x] Tests con 60% de cobertura
-- [ ] Dockerfile
-- [ ] CI/CD (GitHub Actions)
+- [x] Dockerfile
+- [x] CI/CD (GitHub Actions)
 
 ## Equipo
 
