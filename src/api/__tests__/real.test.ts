@@ -68,6 +68,52 @@ describe('api real', () => {
     expect(get).toHaveBeenCalledWith('/componentes/cpu%201')
   })
 
+  it('normaliza los campos snake_case del catálogo', async () => {
+    get.mockResolvedValueOnce([
+      {
+        id: 'cpu-1',
+        tipo: 'cpu',
+        nombre: 'Ryzen 5',
+        fabricante: 'AMD',
+        tdp: 65,
+        socket: 'AM5',
+        tipo_ram: 'DDR5',
+        potencia_w: 65,
+        origen: 'seed',
+      },
+    ] as never)
+
+    const [componente] = await real.listarComponentes()
+
+    expect(componente).toMatchObject({
+      tipoRam: 'DDR5',
+      potenciaW: 65,
+      socket: 'AM5',
+    })
+  })
+
+  it('normaliza el detalle snake_case del catálogo', async () => {
+    get.mockResolvedValueOnce({
+      id: 'cpu-1',
+      tipo: 'cpu',
+      nombre: 'Ryzen 5',
+      fabricante: 'AMD',
+      tdp: 65,
+      socket: 'AM5',
+      tipo_ram: 'DDR5',
+      potencia_w: 65,
+      origen: 'seed',
+      especificaciones: { nucleos: 6 },
+      benchmarks: { cinebenchR24: 1200 },
+    } as never)
+
+    const detalle = await real.obtenerComponente('cpu-1')
+
+    expect(detalle.tipoRam).toBe('DDR5')
+    expect(detalle.potenciaW).toBe(65)
+    expect(detalle.especificaciones).toEqual({ nucleos: 6 })
+  })
+
   it('envía la selección al simular', async () => {
     await real.simular(seleccion, '1440p')
 

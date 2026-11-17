@@ -25,4 +25,19 @@ describe('selector de API', () => {
 
     expect(api.listarComponentes).toBe(real.listarComponentes)
   })
+
+  it('permite integrar solo el catálogo real manteniendo el resto en mocks', async () => {
+    vi.stubEnv('VITE_USE_MOCKS', 'true')
+    vi.stubEnv('VITE_REAL_CATALOG', 'true')
+    vi.resetModules()
+
+    const { api } = await import('../index')
+    const mocks = await import('../mocks')
+    const real = await import('../real')
+
+    expect(api.listarComponentes).toBe(real.listarComponentes)
+    expect(api.obtenerComponente).toBe(real.obtenerComponente)
+    expect(api.login).toBe(mocks.login)
+    expect(api.simular).toBe(mocks.simular)
+  })
 })

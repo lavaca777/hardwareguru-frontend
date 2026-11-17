@@ -23,6 +23,7 @@ export default defineConfig({
     testTimeout: 15_000,
     env: {
       VITE_USE_MOCKS: 'true',
+      VITE_REAL_CATALOG: 'false',
       VITE_API_URL: 'http://api.test',
       VITE_MOCK_DELAY_MS: '0',
     },
