@@ -188,6 +188,7 @@ Cuando auth, builds y alertas estén listos, se cambia a `VITE_USE_MOCKS=false` 
 - **Nueva conversación** pide confirmación solo si ya hay mensajes.
 - El acceso rápido **Preguntar a Guru** del Dashboard abre la ventana mediante `hardwareguru:open-chat`.
 - Contrato actual: `POST /chat` con `{ mensaje, historial }`. El gateway lo adapta a `{ prompt }` para el MCP y propaga `x-user-id`.
+- Las respuestas de Guru se renderizan con un Markdown ligero y seguro: negritas, cursivas, listas, títulos, código y enlaces `http/https`. No se interpreta HTML ni se usa `dangerouslySetInnerHTML`.
 
 ### Mi cuenta (011)
 
@@ -286,7 +287,7 @@ Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
 Los tests viven en carpetas `__tests__/` junto al módulo que prueban.
 
-Estado actual: **319 tests** y **> 90% de cobertura** de líneas.
+Estado actual: **330 tests** y **95.7% de cobertura** de líneas.
 
 ## Estructura
 

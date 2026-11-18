@@ -41,6 +41,29 @@ describe('ChatMessage', () => {
     expect(texto.textContent).toContain('Linea uno\nLinea dos')
   })
 
+  it('renderiza el formato Markdown de las respuestas de Guru', () => {
+    render(
+      <ChatMessage
+        mensaje={mensaje('guru', '**Consumo:** 315 W\n\n1. Revisar fuente')}
+      />,
+    )
+
+    expect(screen.getByText('Consumo:').tagName).toBe('STRONG')
+    expect(screen.getByRole('list').tagName).toBe('OL')
+    expect(screen.getByText('Revisar fuente')).toBeInTheDocument()
+  })
+
+  it('no interpreta Markdown en los mensajes del usuario', () => {
+    render(
+      <ChatMessage
+        mensaje={mensaje('usuario', '**No soy negrita**')}
+      />,
+    )
+
+    expect(screen.getByText('**No soy negrita**')).toBeInTheDocument()
+    expect(screen.queryByText('No soy negrita')).not.toBeInTheDocument()
+  })
+
   it('renderiza mensajes del sistema', () => {
     render(
       <ChatMessage

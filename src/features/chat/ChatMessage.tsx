@@ -1,4 +1,5 @@
 import type { Mensaje } from '@/types'
+import { MarkdownText } from './MarkdownText'
 
 export function ChatMessage({ mensaje }: { mensaje: Mensaje }) {
   if (mensaje.rol === 'sistema') {
@@ -24,9 +25,13 @@ export function ChatMessage({ mensaje }: { mensaje: Mensaje }) {
         }`}
       >
         <span className="sr-only">{esUsuario ? 'Tú: ' : 'Guru: '}</span>
-        <p className="whitespace-pre-wrap break-words text-sm">
-          {mensaje.texto}
-        </p>
+        {esUsuario ? (
+          <p className="whitespace-pre-wrap break-words text-sm">
+            {mensaje.texto}
+          </p>
+        ) : (
+          <MarkdownText text={mensaje.texto} />
+        )}
       </div>
     </div>
   )
