@@ -24,6 +24,8 @@ export default defineConfig({
     env: {
       VITE_USE_MOCKS: 'true',
       VITE_REAL_CATALOG: 'false',
+      VITE_REAL_SIMULATION: 'false',
+      VITE_REAL_CHAT: 'false',
       VITE_API_URL: 'http://api.test',
       VITE_MOCK_DELAY_MS: '0',
     },

@@ -148,9 +148,13 @@ describe('api real', () => {
   it('envía mensajes al chat', async () => {
     await real.enviarMensaje('Hola Guru', [])
 
-    expect(post).toHaveBeenCalledWith('/chat', {
-      mensaje: 'Hola Guru',
-      historial: [],
-    })
+    expect(post).toHaveBeenCalledWith(
+      '/chat',
+      {
+        mensaje: 'Hola Guru',
+        historial: [],
+      },
+      { timeoutMs: 50_000 },
+    )
   })
 })

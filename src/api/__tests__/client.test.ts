@@ -43,6 +43,48 @@ describe('api client', () => {
     const [, init] = fetchMock.mock.calls[0] ?? []
     const headers = new Headers(init?.headers as HeadersInit)
     expect(headers.get('Authorization')).toBe('Bearer token-123')
+    expect(headers.get('x-user-id')).toBe('u1')
+  })
+
+  it('no envía x-user-id si no hay sesión', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    )
+
+    await apiGet('/componentes')
+
+    const [, init] = fetchMock.mock.calls[0] ?? []
+    const headers = new Headers(init?.headers as HeadersInit)
+    expect(headers.get('x-user-id')).toBeNull()
+  })
+
+  it('permite un timeout mayor para el chat', async () => {
+    vi.useFakeTimers()
+    fetchMock.mockImplementation(
+      (_url, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => {
+            reject(new DOMException('Aborted', 'AbortError'))
+          })
+        }),
+    )
+
+    const request = apiPost('/chat', { mensaje: 'Hola' }, { timeoutMs: 50_000 })
+    const expectation = expect(request).rejects.toMatchObject({
+      status: 0,
+      code: 'TIMEOUT',
+    })
+
+    await vi.advanceTimersByTimeAsync(15_000)
+    await expect(
+      Promise.race([
+        request.then(() => 'resolved').catch(() => 'pending'),
+        Promise.resolve('pending'),
+      ]),
+    ).resolves.toBe('pending')
+
+    await vi.advanceTimersByTimeAsync(35_000)
+    await expectation
   })
 
   it('construye la URL con parámetros', async () => {

@@ -48,26 +48,32 @@ VITE_API_URL=http://localhost:3000/api
 VITE_USE_MOCKS=false
 ```
 
-El cliente agrega `Authorization: Bearer <token>` automáticamente a todas las peticiones privadas. Para volver a la demo con datos locales, usar `VITE_USE_MOCKS=true`.
+El cliente agrega `Authorization: Bearer <token>` automáticamente a todas las peticiones privadas. También envía `x-user-id` desde la sesión mock mientras el gateway no tenga el guard JWT activo. Para volver a la demo con datos locales, usar `VITE_USE_MOCKS=true`.
 
-### Integración incremental: catálogo primero
+### Integración incremental: catálogo, simulación y chat
 
-Mientras auth, simulación, builds, alertas y chat todavía no estén expuestos por el gateway, se puede conectar **solo el catálogo real** manteniendo el resto en mocks:
+Se pueden activar los servicios reales de forma independiente:
 
 ```env
 VITE_API_URL=http://localhost:3000/api
 VITE_USE_MOCKS=true
 VITE_REAL_CATALOG=true
+VITE_REAL_SIMULATION=true
+VITE_REAL_CHAT=true
 VITE_MOCK_DELAY_MS=0
 ```
 
 Con esto:
 
-- el login y el resto de la app siguen usando mocks;
-- `/components` usa `GET /api/componentes` y `GET /api/componentes/:id` del gateway;
-- el frontend tolera que el gateway entregue `tipo_ram`/`potencia_w` y los normaliza a `tipoRam`/`potenciaW`.
+- login, builds y alertas siguen usando mocks;
+- `/components` usa `GET /api/componentes` y `GET /api/componentes/:id`;
+- `POST /api/simular` usa el simulador real y el catálogo para resolver TDP/benchmarks;
+- `POST /api/chat` usa el MCP real y reenvía `x-user-id` desde la sesión;
+- el chat tiene timeout de 50s para permitir la respuesta del MCP.
 
-Hay que reiniciar Vite después de cambiar las variables. Antes deben estar arriba el PostgreSQL del catálogo, el servidor gRPC del catálogo y el gateway en `localhost:3000`. Cuando auth y el resto de endpoints estén listos, se cambia a `VITE_USE_MOCKS=false` y `VITE_REAL_CATALOG=false`.
+Para probar simulación y chat reales deben estar arriba el catálogo gRPC, el simulador gRPC, el MCP Server y el gateway en `localhost:3000`. Reinicia Vite después de cambiar las variables. Si un servicio no está disponible, la pantalla muestra el error correspondiente; no hay fallback automático a mock.
+
+Cuando auth, builds y alertas estén listos, se cambia a `VITE_USE_MOCKS=false` y se pueden dejar los flags reales o quitarlos.
 
 | Endpoint (BFF) | Uso |
 |---|---|
@@ -181,7 +187,7 @@ Hay que reiniciar Vite después de cambiar las variables. Antes deben estar arri
 - Errores de IA/red y respuestas vacías generan un mensaje de sistema con **Reintentar**.
 - **Nueva conversación** pide confirmación solo si ya hay mensajes.
 - El acceso rápido **Preguntar a Guru** del Dashboard abre la ventana mediante `hardwareguru:open-chat`.
-- Contrato actual: `POST /chat` con `{ mensaje, historial }`. Para modo real, el gateway debe adaptarlo al MCP (`{ prompt }` + `x-user-id`).
+- Contrato actual: `POST /chat` con `{ mensaje, historial }`. El gateway lo adapta a `{ prompt }` para el MCP y propaga `x-user-id`.
 
 ### Mi cuenta (011)
 
@@ -210,12 +216,17 @@ Crear un archivo `.env` a partir de `.env.example`:
 VITE_API_URL=http://localhost:3000/api
 VITE_USE_MOCKS=true
 VITE_REAL_CATALOG=false
+VITE_REAL_SIMULATION=false
+VITE_REAL_CHAT=false
 VITE_MOCK_DELAY_MS=400
 ```
 
 - `VITE_USE_MOCKS=true` usa `src/api/mocks/` en lugar del gateway real.
-- `VITE_REAL_CATALOG=true` usa el gateway real solo para catálogo, manteniendo auth y el resto en mocks.
+- `VITE_REAL_CATALOG=true` usa el gateway real para catálogo.
+- `VITE_REAL_SIMULATION=true` usa `POST /api/simular`.
+- `VITE_REAL_CHAT=true` usa `POST /api/chat` y el MCP Server.
 - `VITE_MOCK_DELAY_MS` simula latencia para poder ver los estados de carga.
+- Los flags son independientes: se puede conectar solo un servicio y mantener el resto en mocks.
 - Vite solo expone al navegador las variables con prefijo `VITE_`. **Nunca** pongas secretos aquí.
 - No hardcodear URLs: siempre leer `import.meta.env.VITE_API_URL`.
 
@@ -238,14 +249,19 @@ docker build -t hardwareguru-frontend .
 docker run --rm -p 8080:80 hardwareguru-frontend
 ```
 
-La imagen usa Nginx, sirve el SPA con fallback a `index.html` y expone `/healthz`. Por defecto se construye en modo mock (`VITE_USE_MOCKS=true`). Para apuntar al gateway real:
+La imagen usa Nginx, sirve el SPA con fallback a `index.html` y expone `/healthz`. Por defecto se construye en modo mock (`VITE_USE_MOCKS=true`). Para construir el modo híbrido con catálogo, simulación y chat reales:
 
 ```bash
 docker build \
-  --build-arg VITE_USE_MOCKS=false \
+  --build-arg VITE_USE_MOCKS=true \
+  --build-arg VITE_REAL_CATALOG=true \
+  --build-arg VITE_REAL_SIMULATION=true \
+  --build-arg VITE_REAL_CHAT=true \
   --build-arg VITE_API_URL=http://localhost:3000/api \
-  -t hardwareguru-frontend:real .
+  -t hardwareguru-frontend:hybrid .
 ```
+
+Para usar todo el backend real, cambia también `VITE_USE_MOCKS=false`.
 
 > Las variables `VITE_*` se embeben en el build; no se leen en tiempo de ejecución del contenedor.
 

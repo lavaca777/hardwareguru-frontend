@@ -8,6 +8,7 @@ type QueryParams = Record<string, string | number | boolean | null | undefined>
 interface RequestOptions {
   body?: unknown
   params?: QueryParams
+  timeoutMs?: number
 }
 
 export const REQUEST_TIMEOUT_MS = 15_000
@@ -24,8 +25,12 @@ export function apiGet<T>(path: string, params?: QueryParams): Promise<T> {
   return request<T>('GET', path, { params })
 }
 
-export function apiPost<T>(path: string, body?: unknown): Promise<T> {
-  return request<T>('POST', path, { body })
+export function apiPost<T>(
+  path: string,
+  body?: unknown,
+  options: Pick<RequestOptions, 'timeoutMs'> = {},
+): Promise<T> {
+  return request<T>('POST', path, { body, ...options })
 }
 
 export function apiPatch<T>(path: string, body?: unknown): Promise<T> {
@@ -44,11 +49,15 @@ async function request<T>(
   const headers = new Headers({ Accept: 'application/json' })
   if (options.body !== undefined) headers.set('Content-Type', 'application/json')
 
-  const token = readSession()?.token
-  if (token) headers.set('Authorization', `Bearer ${token}`)
+  const session = readSession()
+  if (session?.token) headers.set('Authorization', `Bearer ${session.token}`)
+  if (session?.user.id) headers.set('x-user-id', session.user.id)
 
   const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    options.timeoutMs ?? REQUEST_TIMEOUT_MS,
+  )
 
   const url = buildUrl(path, options.params)
 

@@ -25,6 +25,11 @@ export const FEATURES = {
 export const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true'
 export const USE_REAL_CATALOG =
   import.meta.env.VITE_REAL_CATALOG === 'true'
+export const USE_REAL_SIMULATION =
+  import.meta.env.VITE_REAL_SIMULATION === 'true'
+export const USE_REAL_CHAT = import.meta.env.VITE_REAL_CHAT === 'true'
+
+export const CHAT_REQUEST_TIMEOUT_MS = 50_000
 
 const parsedMockDelay = Number(import.meta.env.VITE_MOCK_DELAY_MS ?? 400)
 export const MOCK_DELAY_MS = Number.isFinite(parsedMockDelay)
@@ -32,8 +37,16 @@ export const MOCK_DELAY_MS = Number.isFinite(parsedMockDelay)
   : 400
 
 export function getApiConfigError(): string | null {
-  if (import.meta.env.VITE_USE_MOCKS === 'true') return null
-  if (import.meta.env.VITE_API_URL?.trim()) return null
+  const useMocks = import.meta.env.VITE_USE_MOCKS === 'true'
+  const usesRealBackend =
+    !useMocks ||
+    import.meta.env.VITE_REAL_CATALOG === 'true' ||
+    import.meta.env.VITE_REAL_SIMULATION === 'true' ||
+    import.meta.env.VITE_REAL_CHAT === 'true'
 
-  return 'Falta configurar la URL de la API.'
+  if (usesRealBackend && !import.meta.env.VITE_API_URL?.trim()) {
+    return 'Falta configurar la URL de la API.'
+  }
+
+  return null
 }
