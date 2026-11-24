@@ -15,6 +15,7 @@ import {
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/api/errors'
 import { resetAppState } from '@/auth/reset'
+import { BUILDS_CHANGED_EVENT } from '@/features/builds/events'
 import { OPEN_CHAT_EVENT } from '@/features/chat/events'
 import { ChatProvider } from '../ChatProvider'
 import { useChat } from '../chatContext'
@@ -111,6 +112,22 @@ describe('ChatProvider', () => {
     expect(enviarMensajeMock).toHaveBeenCalledWith('hola', [])
     expect(screen.getByText('usuario:hola')).toBeInTheDocument()
     expect(screen.getByText('guru:Respuesta de Guru')).toBeInTheDocument()
+  })
+
+  it('notifica cambios de builds después de una respuesta exitosa', async () => {
+    const user = userEvent.setup()
+    const handler = vi.fn()
+    window.addEventListener(BUILDS_CHANGED_EVENT, handler)
+
+    try {
+      renderProvider()
+
+      await user.click(screen.getByRole('button', { name: 'enviar' }))
+
+      await waitFor(() => expect(handler).toHaveBeenCalledOnce())
+    } finally {
+      window.removeEventListener(BUILDS_CHANGED_EVENT, handler)
+    }
   })
 
   it('evita dos envíos simultáneos', async () => {

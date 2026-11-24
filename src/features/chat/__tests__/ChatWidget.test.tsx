@@ -9,6 +9,7 @@ import {
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/api/errors'
+import { BUILDS_CHANGED_EVENT } from '@/features/builds/events'
 import { ChatProvider } from '../ChatProvider'
 import { ChatWidget } from '../ChatWidget'
 import { CHAT_SUGGESTIONS, CHAT_WELCOME } from '../constants'
@@ -216,6 +217,28 @@ describe('ChatWidget', () => {
     expect(
       screen.getByRole('button', { name: 'Abrir chat de Guru' }),
     ).toBeInTheDocument()
+  })
+
+  it('permite actualizar builds y alertas sin reiniciar el chat', async () => {
+    const handler = vi.fn()
+    window.addEventListener(BUILDS_CHANGED_EVENT, handler)
+
+    try {
+      const user = await abrirChat()
+
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Actualizar builds y alertas',
+        }),
+      )
+
+      expect(handler).toHaveBeenCalledOnce()
+      expect(
+        screen.getByRole('region', { name: 'Chat de Guru' }),
+      ).toBeInTheDocument()
+    } finally {
+      window.removeEventListener(BUILDS_CHANGED_EVENT, handler)
+    }
   })
 
   it('pide confirmación para nueva conversación solo con historial', async () => {

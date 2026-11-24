@@ -9,6 +9,7 @@ import {
 import { api } from '@/api'
 import { registerResetHandler } from '@/auth/reset'
 import { MAX_MENSAJE_CHAT } from '@/config'
+import { notifyBuildsChanged } from '@/features/builds/events'
 import { OPEN_CHAT_EVENT } from '@/features/chat/events'
 import type { Mensaje, RolMensaje } from '@/types'
 import { ChatContext, type ChatContextValue } from './chatContext'
@@ -102,6 +103,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         }
 
         setMensajes((prev) => [...prev, crearMensaje('guru', limpia)])
+        // El chat puede crear una build mediante una tool del MCP. Notificamos
+        // para refrescar builds/alertas sin recargar ni perder la conversación.
+        notifyBuildsChanged()
         if (!abiertoRef.current) setHayNuevaRespuesta(true)
       } catch (loadError) {
         if (requestId !== requestIdRef.current) return

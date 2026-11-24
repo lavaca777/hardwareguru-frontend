@@ -194,6 +194,8 @@ Con todos los flags reales se puede usar `VITE_USE_MOCKS=false`. Los flags sigue
 - Mientras Guru responde se muestra **“Guru está escribiendo…”** y se bloquea el envío.
 - Errores de IA/red y respuestas vacías generan un mensaje de sistema con **Reintentar**.
 - **Nueva conversación** pide confirmación solo si ya hay mensajes.
+- Al recibir una respuesta, el chat emite `hardwareguru:builds-changed` para refrescar builds y alertas sin recargar la página ni perder la conversación. Es útil cuando Guru crea una build con una tool del MCP.
+- El header del chat incluye **Actualizar builds y alertas** para forzar ese refresco manualmente.
 - El acceso rápido **Preguntar a Guru** del Dashboard abre la ventana mediante `hardwareguru:open-chat`.
 - Contrato actual: `POST /chat` con `{ mensaje, historial }`. El gateway lo adapta a `{ prompt }` para el MCP y propaga `x-user-id`.
 - Las respuestas de Guru se renderizan con un Markdown ligero y seguro: negritas, cursivas, listas, títulos, código y enlaces `http/https`. No se interpreta HTML ni se usa `dangerouslySetInnerHTML`.
