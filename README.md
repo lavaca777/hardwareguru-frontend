@@ -48,32 +48,36 @@ VITE_API_URL=http://localhost:3000/api
 VITE_USE_MOCKS=false
 ```
 
-El cliente agrega `Authorization: Bearer <token>` automáticamente a todas las peticiones privadas. También envía `x-user-id` desde la sesión mock mientras el gateway no tenga el guard JWT activo. Para volver a la demo con datos locales, usar `VITE_USE_MOCKS=true`.
+El cliente agrega `Authorization: Bearer <token>` automáticamente a todas las peticiones privadas. El gateway valida el JWT y deriva el usuario de ese token; `x-user-id` queda solo como compatibilidad de desarrollo y el guard lo sobrescribe.
 
-### Integración incremental: catálogo, simulación y chat
+### Integración incremental: auth, catálogo, simulación, chat y alertas
 
 Se pueden activar los servicios reales de forma independiente:
 
 ```env
 VITE_API_URL=http://localhost:3000/api
 VITE_USE_MOCKS=true
+VITE_REAL_AUTH=true
 VITE_REAL_CATALOG=true
 VITE_REAL_SIMULATION=true
 VITE_REAL_CHAT=true
+VITE_REAL_ALERTS=true
 VITE_MOCK_DELAY_MS=0
 ```
 
 Con esto:
 
-- login, builds y alertas siguen usando mocks;
+- auth real: registro con nombre y login con JWT;
+- builds siguen usando mocks;
 - `/components` usa `GET /api/componentes` y `GET /api/componentes/:id`;
 - `POST /api/simular` usa el simulador real y el catálogo para resolver TDP/benchmarks;
-- `POST /api/chat` usa el MCP real y reenvía `x-user-id` desde la sesión;
+- `POST /api/chat` usa el MCP real con las tools de catálogo, compatibilidad, builds y simulación;
+- `GET /api/alerts` y `PATCH /api/alerts/:id/read` usan el servicio real de alertas;
 - el chat tiene timeout de 50s para permitir la respuesta del MCP.
 
-Para probar simulación y chat reales deben estar arriba el catálogo gRPC, el simulador gRPC, el MCP Server y el gateway en `localhost:3000`. Reinicia Vite después de cambiar las variables. Si un servicio no está disponible, la pantalla muestra el error correspondiente; no hay fallback automático a mock.
+Para probar el modo real deben estar arriba: Auth Service, gateway, catálogo, simulador, MCP, alerts-service y PostgreSQL. Reinicia Vite después de cambiar las variables. Si un servicio no está disponible, la pantalla muestra el error correspondiente; no hay fallback automático a mock.
 
-Cuando auth, builds y alertas estén listos, se cambia a `VITE_USE_MOCKS=false` y se pueden dejar los flags reales o quitarlos.
+Cuando el gateway exponga `/api/builds`, se podrá desactivar el mock de builds. Después de eso se puede usar `VITE_USE_MOCKS=false`.
 
 | Endpoint (BFF) | Uso |
 |---|---|
@@ -216,16 +220,20 @@ Crear un archivo `.env` a partir de `.env.example`:
 ```env
 VITE_API_URL=http://localhost:3000/api
 VITE_USE_MOCKS=true
+VITE_REAL_AUTH=false
 VITE_REAL_CATALOG=false
 VITE_REAL_SIMULATION=false
 VITE_REAL_CHAT=false
+VITE_REAL_ALERTS=false
 VITE_MOCK_DELAY_MS=400
 ```
 
 - `VITE_USE_MOCKS=true` usa `src/api/mocks/` en lugar del gateway real.
+- `VITE_REAL_AUTH=true` usa login/registro reales y JWT.
 - `VITE_REAL_CATALOG=true` usa el gateway real para catálogo.
 - `VITE_REAL_SIMULATION=true` usa `POST /api/simular`.
 - `VITE_REAL_CHAT=true` usa `POST /api/chat` y el MCP Server.
+- `VITE_REAL_ALERTS=true` usa `GET /api/alerts` y `PATCH /api/alerts/:id/read`.
 - `VITE_MOCK_DELAY_MS` simula latencia para poder ver los estados de carga.
 - Los flags son independientes: se puede conectar solo un servicio y mantener el resto en mocks.
 - Vite solo expone al navegador las variables con prefijo `VITE_`. **Nunca** pongas secretos aquí.
@@ -255,9 +263,11 @@ La imagen usa Nginx, sirve el SPA con fallback a `index.html` y expone `/healthz
 ```bash
 docker build \
   --build-arg VITE_USE_MOCKS=true \
+  --build-arg VITE_REAL_AUTH=true \
   --build-arg VITE_REAL_CATALOG=true \
   --build-arg VITE_REAL_SIMULATION=true \
   --build-arg VITE_REAL_CHAT=true \
+  --build-arg VITE_REAL_ALERTS=true \
   --build-arg VITE_API_URL=http://localhost:3000/api \
   -t hardwareguru-frontend:hybrid .
 ```
@@ -287,7 +297,7 @@ Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
 Los tests viven en carpetas `__tests__/` junto al módulo que prueban.
 
-Estado actual: **330 tests** y **95.7% de cobertura** de líneas.
+Estado actual: **335 tests** y **95.7% de cobertura** de líneas.
 
 ## Estructura
 

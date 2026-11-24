@@ -51,12 +51,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(nextSession)
   }, [])
 
-  const register = useCallback(async (email: string, password: string) => {
-    const nextSession = await api.register(email.trim().toLowerCase(), password)
-    resetAppState()
-    saveSession(nextSession)
-    setSession(nextSession)
-  }, [])
+  const register = useCallback(
+    async (nombre: string, email: string, password: string) => {
+      const nextSession = await api.register(
+        nombre.trim(),
+        email.trim().toLowerCase(),
+        password,
+      )
+      resetAppState()
+      saveSession(nextSession)
+      setSession(nextSession)
+    },
+    [],
+  )
 
   const logout = useCallback(() => {
     clearSession()

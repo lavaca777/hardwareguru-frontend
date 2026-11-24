@@ -1,6 +1,7 @@
 import { MIN_PASSWORD } from '@/config'
 
 export interface FieldErrors {
+  nombre?: string
   email?: string
   password?: string
   confirmPassword?: string
@@ -12,10 +13,18 @@ export interface LoginFormValues {
 }
 
 export interface RegisterFormValues extends LoginFormValues {
+  nombre: string
   confirmPassword: string
 }
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+export function validateName(nombre: string): string | undefined {
+  if (!nombre.trim()) return 'Ingresa tu nombre.'
+  if (nombre.trim().length > 100) return 'El nombre no puede superar 100 caracteres.'
+
+  return undefined
+}
 
 export function validateEmail(email: string): string | undefined {
   const value = email.trim()
@@ -59,11 +68,13 @@ export function validateRegisterForm(
   values: RegisterFormValues,
 ): FieldErrors {
   const errors = validateLoginForm(values)
+  const nameError = validateName(values.nombre)
   const confirmError = validateConfirmPassword(
     values.password,
     values.confirmPassword,
   )
 
+  if (nameError) errors.nombre = nameError
   if (confirmError) errors.confirmPassword = confirmError
 
   return errors

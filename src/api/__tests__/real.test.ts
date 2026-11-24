@@ -29,17 +29,47 @@ beforeEach(() => {
 })
 
 describe('api real', () => {
-  it('llama a login y register', async () => {
-    await real.login('a@b.com', '12345678')
-    await real.register('a@b.com', '12345678')
+  it('normaliza el login y registra para luego iniciar sesión', async () => {
+    post
+      .mockResolvedValueOnce({
+        token: 'jwt-token',
+        user: { id: 7, email: 'a@b.com', nombre: 'Maxi' },
+      })
+      .mockResolvedValueOnce({
+        mensaje: 'Usuario registrado',
+        user: { id: 7, email: 'a@b.com', nombre: 'Maxi' },
+      })
+      .mockResolvedValueOnce({
+        token: 'jwt-token',
+        user: { id: 7, email: 'a@b.com', nombre: 'Maxi' },
+      })
 
+    const login = await real.login('a@b.com', '12345678')
+    const registered = await real.register('Maxi', 'a@b.com', '12345678')
+
+    expect(login.user.id).toBe('7')
+    expect(registered.user.id).toBe('7')
     expect(post).toHaveBeenNthCalledWith(1, '/auth/login', {
       email: 'a@b.com',
       password: '12345678',
     })
     expect(post).toHaveBeenNthCalledWith(2, '/auth/register', {
+      nombre: 'Maxi',
       email: 'a@b.com',
       password: '12345678',
+    })
+    expect(post).toHaveBeenNthCalledWith(3, '/auth/login', {
+      email: 'a@b.com',
+      password: '12345678',
+    })
+  })
+
+  it('rechaza una respuesta de autenticación incompleta', async () => {
+    post.mockResolvedValueOnce({ token: '', user: { id: 1 } })
+
+    await expect(real.login('a@b.com', '12345678')).rejects.toMatchObject({
+      status: 502,
+      code: 'AUTH_CONTRACT',
     })
   })
 

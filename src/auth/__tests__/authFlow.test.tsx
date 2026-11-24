@@ -155,6 +155,7 @@ describe('flujo de registro', () => {
     const user = userEvent.setup()
     renderFlow('/register')
 
+    await user.type(screen.getByLabelText('Nombre'), 'Nuevo')
     await user.type(
       screen.getByLabelText('Correo electrónico'),
       'nuevo@test.com',
@@ -175,6 +176,7 @@ describe('flujo de registro', () => {
     const user = userEvent.setup()
     renderFlow('/register')
 
+    await user.type(screen.getByLabelText('Nombre'), 'Existente')
     await user.type(
       screen.getByLabelText('Correo electrónico'),
       'exists@test.com',
@@ -195,6 +197,7 @@ describe('flujo de registro', () => {
     const user = userEvent.setup()
     renderFlow('/register')
 
+    await user.type(screen.getByLabelText('Nombre'), 'Nuevo')
     await user.type(
       screen.getByLabelText('Correo electrónico'),
       'nuevo@test.com',

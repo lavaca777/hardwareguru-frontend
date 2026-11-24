@@ -48,6 +48,7 @@ describe('validación de autenticación', () => {
   it('valida el formulario de registro', () => {
     expect(
       validateRegisterForm({
+        nombre: 'Maxi',
         email: 'a@b.com',
         password: '12345678',
         confirmPassword: '12345679',
@@ -57,11 +58,21 @@ describe('validación de autenticación', () => {
     expect(
       hasFieldErrors(
         validateRegisterForm({
+          nombre: 'Maxi',
           email: 'a@b.com',
           password: '12345678',
           confirmPassword: '12345678',
         }),
       ),
     ).toBe(false)
+
+    expect(
+      validateRegisterForm({
+        nombre: '   ',
+        email: 'a@b.com',
+        password: '12345678',
+        confirmPassword: '12345678',
+      }),
+    ).toEqual({ nombre: 'Ingresa tu nombre.' })
   })
 })

@@ -23,11 +23,13 @@ export const FEATURES = {
 } as const
 
 export const USE_MOCKS = import.meta.env.VITE_USE_MOCKS === 'true'
+export const USE_REAL_AUTH = import.meta.env.VITE_REAL_AUTH === 'true'
 export const USE_REAL_CATALOG =
   import.meta.env.VITE_REAL_CATALOG === 'true'
 export const USE_REAL_SIMULATION =
   import.meta.env.VITE_REAL_SIMULATION === 'true'
 export const USE_REAL_CHAT = import.meta.env.VITE_REAL_CHAT === 'true'
+export const USE_REAL_ALERTS = import.meta.env.VITE_REAL_ALERTS === 'true'
 
 export const CHAT_REQUEST_TIMEOUT_MS = 50_000
 
@@ -40,9 +42,11 @@ export function getApiConfigError(): string | null {
   const useMocks = import.meta.env.VITE_USE_MOCKS === 'true'
   const usesRealBackend =
     !useMocks ||
+    import.meta.env.VITE_REAL_AUTH === 'true' ||
     import.meta.env.VITE_REAL_CATALOG === 'true' ||
     import.meta.env.VITE_REAL_SIMULATION === 'true' ||
-    import.meta.env.VITE_REAL_CHAT === 'true'
+    import.meta.env.VITE_REAL_CHAT === 'true' ||
+    import.meta.env.VITE_REAL_ALERTS === 'true'
 
   if (usesRealBackend && !import.meta.env.VITE_API_URL?.trim()) {
     return 'Falta configurar la URL de la API.'

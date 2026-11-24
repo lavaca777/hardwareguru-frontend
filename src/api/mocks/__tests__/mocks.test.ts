@@ -193,7 +193,7 @@ describe('mocks de auth y chat', () => {
 
   it('falla el registro de un correo existente', async () => {
     await expect(
-      register('exists@test.com', '12345678'),
+      register('Maxi', 'exists@test.com', '12345678'),
     ).rejects.toMatchObject({ status: 409, code: 'EMAIL_EXISTS' })
   })
 

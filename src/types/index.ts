@@ -76,6 +76,7 @@ export interface Mensaje {
 export interface User {
   id: string
   email: string
+  nombre?: string
   creadoEn?: string
 }
 

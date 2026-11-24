@@ -20,6 +20,7 @@ export async function login(
 }
 
 export async function register(
+  _nombre: string,
   email: string,
   _password: string,
 ): Promise<Session> {

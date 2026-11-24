@@ -7,6 +7,7 @@ import {
   hasFieldErrors,
   validateConfirmPassword,
   validateEmail,
+  validateName,
   validatePassword,
   validateRegisterForm,
   type FieldErrors,
@@ -18,6 +19,7 @@ export function RegisterPage() {
   const { register } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -26,6 +28,7 @@ export function RegisterPage() {
   const [formError, setFormError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
+  const nameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
   const confirmRef = useRef<HTMLInputElement>(null)
@@ -36,6 +39,12 @@ export function RegisterPage() {
   const passwordMeetsLength = password.length >= MIN_PASSWORD
   const passwordsMatch =
     confirmPassword.length > 0 && password === confirmPassword
+
+  const handleNameChange = (value: string) => {
+    setNombre(value)
+    setFormError(null)
+    setErrors((prev) => ({ ...prev, nombre: undefined }))
+  }
 
   const handleEmailChange = (value: string) => {
     setEmail(value)
@@ -60,13 +69,15 @@ export function RegisterPage() {
     if (submitting) return
 
     const nextErrors = validateRegisterForm({
+      nombre,
       email,
       password,
       confirmPassword,
     })
     setErrors(nextErrors)
     if (hasFieldErrors(nextErrors)) {
-      if (nextErrors.email) emailRef.current?.focus()
+      if (nextErrors.nombre) nameRef.current?.focus()
+      else if (nextErrors.email) emailRef.current?.focus()
       else if (nextErrors.password) passwordRef.current?.focus()
       else confirmRef.current?.focus()
       return
@@ -76,7 +87,7 @@ export function RegisterPage() {
     setFormError(null)
 
     try {
-      await register(email, password)
+      await register(nombre, email, password)
       navigate(from, { replace: true })
     } catch (error) {
       setFormError(authErrorMessage(error))
@@ -103,6 +114,22 @@ export function RegisterPage() {
       )}
 
       <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
+        <TextField
+          label="Nombre"
+          name="nombre"
+          type="text"
+          autoComplete="name"
+          placeholder="Tu nombre"
+          value={nombre}
+          inputRef={nameRef}
+          error={errors.nombre}
+          onChange={(event) => handleNameChange(event.target.value)}
+          onBlur={() => {
+            const error = validateName(nombre)
+            setErrors((prev) => ({ ...prev, nombre: error }))
+          }}
+        />
+
         <TextField
           label="Correo electrónico"
           name="email"
