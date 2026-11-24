@@ -77,6 +77,22 @@ describe('selector de API', () => {
     expect(api.listarAlertas).toBe(mocks.listarAlertas)
   })
 
+  it('permite integrar builds reales manteniendo auth y alertas en mocks', async () => {
+    vi.stubEnv('VITE_USE_MOCKS', 'true')
+    vi.stubEnv('VITE_REAL_BUILDS', 'true')
+    vi.resetModules()
+
+    const { api } = await import('../index')
+    const mocks = await import('../mocks')
+    const real = await import('../real')
+
+    expect(api.guardarBuild).toBe(real.guardarBuild)
+    expect(api.listarBuilds).toBe(real.listarBuilds)
+    expect(api.eliminarBuild).toBe(real.eliminarBuild)
+    expect(api.login).toBe(mocks.login)
+    expect(api.listarAlertas).toBe(mocks.listarAlertas)
+  })
+
   it('permite integrar auth y alertas reales manteniendo builds en mocks', async () => {
     vi.stubEnv('VITE_USE_MOCKS', 'true')
     vi.stubEnv('VITE_REAL_AUTH', 'true')

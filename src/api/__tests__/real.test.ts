@@ -167,6 +167,25 @@ describe('api real', () => {
     expect(remove).toHaveBeenCalledWith('/builds/b%201')
   })
 
+  it('envía el resultado mostrado al guardar una build', async () => {
+    await real.guardarBuild('Mi build', seleccion, '1080p', {
+      consumoEstimadoW: 420,
+      cuelloBotellaPct: 12,
+      resolucion: '1080p',
+      estado: 'RIESGO',
+      motivo: 'Fuente ajustada',
+    })
+
+    expect(post).toHaveBeenCalledWith('/builds', {
+      nombre: 'Mi build',
+      ...seleccion,
+      resolucion: '1080p',
+      estadoRiesgo: 'RIESGO',
+      consumoTotalWatts: 420,
+      cuelloBotellaPorcentaje: 12,
+    })
+  })
+
   it('gestiona alertas', async () => {
     await real.listarAlertas()
     await real.marcarLeida('a 1')

@@ -50,7 +50,7 @@ VITE_USE_MOCKS=false
 
 El cliente agrega `Authorization: Bearer <token>` automáticamente a todas las peticiones privadas. El gateway valida el JWT y deriva el usuario de ese token; `x-user-id` queda solo como compatibilidad de desarrollo y el guard lo sobrescribe.
 
-### Integración incremental: auth, catálogo, simulación, chat y alertas
+### Integración incremental: auth, catálogo, simulación, builds, chat y alertas
 
 Se pueden activar los servicios reales de forma independiente:
 
@@ -62,22 +62,23 @@ VITE_REAL_CATALOG=true
 VITE_REAL_SIMULATION=true
 VITE_REAL_CHAT=true
 VITE_REAL_ALERTS=true
+VITE_REAL_BUILDS=true
 VITE_MOCK_DELAY_MS=0
 ```
 
 Con esto:
 
 - auth real: registro con nombre y login con JWT;
-- builds siguen usando mocks;
+- builds reales: `POST /api/builds`, `GET /api/builds` y `DELETE /api/builds/:id`, incluyendo builds en riesgo o incompatibles;
 - `/components` usa `GET /api/componentes` y `GET /api/componentes/:id`;
 - `POST /api/simular` usa el simulador real y el catálogo para resolver TDP/benchmarks;
 - `POST /api/chat` usa el MCP real con las tools de catálogo, compatibilidad, builds y simulación;
 - `GET /api/alerts` y `PATCH /api/alerts/:id/read` usan el servicio real de alertas;
 - el chat tiene timeout de 50s para permitir la respuesta del MCP.
 
-Para probar el modo real deben estar arriba: Auth Service, gateway, catálogo, simulador, MCP, alerts-service y PostgreSQL. Reinicia Vite después de cambiar las variables. Si un servicio no está disponible, la pantalla muestra el error correspondiente; no hay fallback automático a mock.
+Para probar el modo real deben estar arriba: Auth Service, gateway, catálogo, simulador, MCP, alerts-service, Kafka y PostgreSQL. El gateway publica un evento `BuildGuardada` en Kafka al guardar una build; alerts-service lo consume y crea la alerta si el consumo supera el 85% de la fuente. Reinicia Vite después de cambiar las variables. Si un servicio no está disponible, la pantalla muestra el error correspondiente; no hay fallback automático a mock.
 
-Cuando el gateway exponga `/api/builds`, se podrá desactivar el mock de builds. Después de eso se puede usar `VITE_USE_MOCKS=false`.
+Con todos los flags reales se puede usar `VITE_USE_MOCKS=false`. Los flags siguen siendo independientes, así que también se puede mantener `VITE_USE_MOCKS=true` y activar solo los servicios que estén levantados.
 
 | Endpoint (BFF) | Uso |
 |---|---|
@@ -227,6 +228,7 @@ VITE_REAL_CATALOG=false
 VITE_REAL_SIMULATION=false
 VITE_REAL_CHAT=false
 VITE_REAL_ALERTS=false
+VITE_REAL_BUILDS=false
 VITE_MOCK_DELAY_MS=400
 ```
 
@@ -236,6 +238,7 @@ VITE_MOCK_DELAY_MS=400
 - `VITE_REAL_SIMULATION=true` usa `POST /api/simular`.
 - `VITE_REAL_CHAT=true` usa `POST /api/chat` y el MCP Server.
 - `VITE_REAL_ALERTS=true` usa `GET /api/alerts` y `PATCH /api/alerts/:id/read`.
+- `VITE_REAL_BUILDS=true` usa `POST /api/builds`, `GET /api/builds` y `DELETE /api/builds/:id`.
 - `VITE_MOCK_DELAY_MS` simula latencia para poder ver los estados de carga.
 - Los flags son independientes: se puede conectar solo un servicio y mantener el resto en mocks.
 - Vite solo expone al navegador las variables con prefijo `VITE_`. **Nunca** pongas secretos aquí.
@@ -270,6 +273,7 @@ docker build \
   --build-arg VITE_REAL_SIMULATION=true \
   --build-arg VITE_REAL_CHAT=true \
   --build-arg VITE_REAL_ALERTS=true \
+  --build-arg VITE_REAL_BUILDS=true \
   --build-arg VITE_API_URL=http://localhost:3000/api \
   -t hardwareguru-frontend:hybrid .
 ```

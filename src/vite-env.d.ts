@@ -8,6 +8,7 @@ interface ImportMetaEnv {
   readonly VITE_REAL_SIMULATION?: string
   readonly VITE_REAL_CHAT?: string
   readonly VITE_REAL_ALERTS?: string
+  readonly VITE_REAL_BUILDS?: string
   readonly VITE_MOCK_DELAY_MS?: string
 }
 

@@ -2,6 +2,7 @@ import {
   USE_MOCKS,
   USE_REAL_ALERTS,
   USE_REAL_AUTH,
+  USE_REAL_BUILDS,
   USE_REAL_CATALOG,
   USE_REAL_CHAT,
   USE_REAL_SIMULATION,
@@ -26,6 +27,13 @@ export const api = {
       }
     : {}),
   ...(USE_REAL_SIMULATION ? { simular: real.simular } : {}),
+  ...(USE_REAL_BUILDS
+    ? {
+        guardarBuild: real.guardarBuild,
+        listarBuilds: real.listarBuilds,
+        eliminarBuild: real.eliminarBuild,
+      }
+    : {}),
   ...(USE_REAL_CHAT ? { enviarMensaje: real.enviarMensaje } : {}),
   ...(USE_REAL_ALERTS
     ? {

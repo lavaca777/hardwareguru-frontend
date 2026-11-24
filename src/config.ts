@@ -30,6 +30,7 @@ export const USE_REAL_SIMULATION =
   import.meta.env.VITE_REAL_SIMULATION === 'true'
 export const USE_REAL_CHAT = import.meta.env.VITE_REAL_CHAT === 'true'
 export const USE_REAL_ALERTS = import.meta.env.VITE_REAL_ALERTS === 'true'
+export const USE_REAL_BUILDS = import.meta.env.VITE_REAL_BUILDS === 'true'
 
 export const CHAT_REQUEST_TIMEOUT_MS = 50_000
 
@@ -46,7 +47,8 @@ export function getApiConfigError(): string | null {
     import.meta.env.VITE_REAL_CATALOG === 'true' ||
     import.meta.env.VITE_REAL_SIMULATION === 'true' ||
     import.meta.env.VITE_REAL_CHAT === 'true' ||
-    import.meta.env.VITE_REAL_ALERTS === 'true'
+    import.meta.env.VITE_REAL_ALERTS === 'true' ||
+    import.meta.env.VITE_REAL_BUILDS === 'true'
 
   if (usesRealBackend && !import.meta.env.VITE_API_URL?.trim()) {
     return 'Falta configurar la URL de la API.'

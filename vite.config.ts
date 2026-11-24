@@ -28,6 +28,7 @@ export default defineConfig({
       VITE_REAL_SIMULATION: 'false',
       VITE_REAL_CHAT: 'false',
       VITE_REAL_ALERTS: 'false',
+      VITE_REAL_BUILDS: 'false',
       VITE_API_URL: 'http://api.test',
       VITE_MOCK_DELAY_MS: '0',
     },

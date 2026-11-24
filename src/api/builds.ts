@@ -10,9 +10,20 @@ export function guardarBuild(
   nombre: string,
   seleccion: BuildSeleccion,
   resolucion: Resolucion,
-  _resultado?: SimulacionResultado,
+  resultado?: SimulacionResultado,
 ): Promise<Build> {
-  return apiPost<Build>('/builds', { nombre, ...seleccion, resolucion })
+  return apiPost<Build>('/builds', {
+    nombre,
+    ...seleccion,
+    resolucion,
+    ...(resultado
+      ? {
+          estadoRiesgo: resultado.estado,
+          consumoTotalWatts: resultado.consumoEstimadoW,
+          cuelloBotellaPorcentaje: resultado.cuelloBotellaPct,
+        }
+      : {}),
+  })
 }
 
 export function listarBuilds(): Promise<Build[]> {
