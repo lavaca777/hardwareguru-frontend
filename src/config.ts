@@ -3,6 +3,7 @@ export const MAX_NOMBRE_BUILD = 60
 export const MIN_PASSWORD = 8
 export const MAX_MENSAJE_CHAT = 1000
 export const ALERTS_POLL_MS = 60_000
+export const ALERTS_BUILD_REFRESH_MS = 1200
 
 export const GURU_TIPS = [
   'Deja al menos un 20% de margen entre el consumo estimado y la potencia de tu fuente.',

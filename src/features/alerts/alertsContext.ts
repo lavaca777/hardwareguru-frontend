@@ -8,6 +8,7 @@ export interface AlertsContextValue {
   cargando: boolean
   error: string | null
   marcarLeida: (id: string) => Promise<void>
+  eliminarAlerta: (id: string) => Promise<void>
   recargar: () => void
   reset: () => void
   ensureLoaded: () => Promise<void>

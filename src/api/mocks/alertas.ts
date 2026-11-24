@@ -22,6 +22,17 @@ export async function marcarLeida(id: string): Promise<Alerta> {
   return { ...alerta }
 }
 
+export async function eliminarAlerta(id: string): Promise<void> {
+  await mockDelay()
+
+  const index = alerts.findIndex((item) => item.id === id)
+  if (index === -1) {
+    throw new ApiError(404, 'NOT_FOUND', 'No encontramos esa alerta.')
+  }
+
+  alerts.splice(index, 1)
+}
+
 export function resetMockAlerts(): void {
   alerts = seedAlerts.map((alerta) => ({ ...alerta }))
 }

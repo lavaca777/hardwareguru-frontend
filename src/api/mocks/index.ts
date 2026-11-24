@@ -7,5 +7,10 @@ export {
   eliminarBuild,
   resetMockBuilds,
 } from './builds'
-export { listarAlertas, marcarLeida, resetMockAlerts } from './alertas'
+export {
+  eliminarAlerta,
+  listarAlertas,
+  marcarLeida,
+  resetMockAlerts,
+} from './alertas'
 export { enviarMensaje } from './chat'

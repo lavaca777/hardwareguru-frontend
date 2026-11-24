@@ -189,9 +189,11 @@ describe('api real', () => {
   it('gestiona alertas', async () => {
     await real.listarAlertas()
     await real.marcarLeida('a 1')
+    await real.eliminarAlerta('a 1')
 
     expect(get).toHaveBeenCalledWith('/alerts')
     expect(patch).toHaveBeenCalledWith('/alerts/a%201/read')
+    expect(remove).toHaveBeenCalledWith('/alerts/a%201')
   })
 
   it('envía mensajes al chat', async () => {

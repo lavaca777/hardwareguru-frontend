@@ -1,5 +1,5 @@
 import type { Alerta } from '@/types'
-import { apiGet, apiPatch } from './client'
+import { apiDelete, apiGet, apiPatch } from './client'
 
 export function listarAlertas(): Promise<Alerta[]> {
   return apiGet<Alerta[]>('/alerts')
@@ -7,4 +7,8 @@ export function listarAlertas(): Promise<Alerta[]> {
 
 export function marcarLeida(id: string): Promise<Alerta> {
   return apiPatch<Alerta>(`/alerts/${encodeURIComponent(id)}/read`)
+}
+
+export function eliminarAlerta(id: string): Promise<void> {
+  return apiDelete(`/alerts/${encodeURIComponent(id)}`)
 }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { PageHeader } from '@/components/PageHeader'
 import {
   Button,
+  ConfirmDialog,
   EmptyState,
   ErrorState,
   LoadingState,
@@ -24,6 +25,7 @@ export function AlertsPage() {
     cargando,
     error,
     marcarLeida,
+    eliminarAlerta,
     recargar,
   } = useAlerts()
   const {
@@ -35,6 +37,8 @@ export function AlertsPage() {
   const navigate = useNavigate()
   const [filtro, setFiltro] = useState<AlertsFilter>('pendientes')
   const [marcandoId, setMarcandoId] = useState<string | null>(null)
+  const [alertaAEliminar, setAlertaAEliminar] = useState<Alerta | null>(null)
+  const [eliminando, setEliminando] = useState(false)
 
   const total = pendientes.length + leidas.length
   const lista = filtro === 'pendientes' ? pendientes : leidas
@@ -64,6 +68,24 @@ export function AlertsPage() {
       })
     } finally {
       setMarcandoId(null)
+    }
+  }
+
+  const handleEliminar = async () => {
+    if (!alertaAEliminar || eliminando) return
+
+    setEliminando(true)
+    try {
+      await eliminarAlerta(alertaAEliminar.id)
+      setAlertaAEliminar(null)
+      mostrar({ tipo: 'ok', texto: 'Alerta eliminada.' })
+    } catch {
+      mostrar({
+        tipo: 'error',
+        texto: 'No pudimos eliminar la alerta. Reintenta.',
+      })
+    } finally {
+      setEliminando(false)
     }
   }
 
@@ -164,12 +186,36 @@ export function AlertsPage() {
                       : () => void handleMarcar(alerta)
                   }
                   marcando={marcandoId === alerta.id}
+                  onEliminar={
+                    alerta.leida
+                      ? () => setAlertaAEliminar(alerta)
+                      : undefined
+                  }
+                  eliminando={
+                    eliminando && alertaAEliminar?.id === alerta.id
+                  }
                 />
               ))}
             </div>
           )}
         </>
       )}
+
+      <ConfirmDialog
+        open={alertaAEliminar !== null}
+        onClose={() => setAlertaAEliminar(null)}
+        onConfirm={() => void handleEliminar()}
+        title="Eliminar alerta"
+        description={
+          alertaAEliminar
+            ? `¿Eliminar la alerta de "${alertaAEliminar.buildName}"? Esta acción no se puede deshacer.`
+            : ''
+        }
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        tone="danger"
+        loading={eliminando}
+      />
     </section>
   )
 }

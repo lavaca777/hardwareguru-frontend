@@ -4,19 +4,24 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/api/errors'
 import { seedAlerts } from '@/api/mocks/data'
 import { resetAppState } from '@/auth/reset'
-import { ALERTS_POLL_MS } from '@/config'
+import { ALERTS_BUILD_REFRESH_MS, ALERTS_POLL_MS } from '@/config'
+import { BUILDS_CHANGED_EVENT } from '@/features/builds/events'
 import { AlertsProvider } from '../AlertsProvider'
 import { useAlerts } from '../alertsContext'
 
-const { listarAlertasMock, marcarLeidaMock } = vi.hoisted(() => ({
-  listarAlertasMock: vi.fn(),
-  marcarLeidaMock: vi.fn(),
-}))
+const { listarAlertasMock, marcarLeidaMock, eliminarAlertaMock } = vi.hoisted(
+  () => ({
+    listarAlertasMock: vi.fn(),
+    marcarLeidaMock: vi.fn(),
+    eliminarAlertaMock: vi.fn(),
+  }),
+)
 
 vi.mock('@/api', () => ({
   api: {
     listarAlertas: listarAlertasMock,
     marcarLeida: marcarLeidaMock,
+    eliminarAlerta: eliminarAlertaMock,
   },
 }))
 
@@ -27,6 +32,7 @@ function Consumer() {
     cargando,
     error,
     marcarLeida,
+    eliminarAlerta,
     recargar,
   } = useAlerts()
 
@@ -39,6 +45,9 @@ function Consumer() {
       </span>
       <button type="button" onClick={() => void marcarLeida('a1')}>
         marcar
+      </button>
+      <button type="button" onClick={() => void eliminarAlerta('a2')}>
+        eliminar
       </button>
       <button type="button" onClick={recargar}>
         recargar
@@ -54,12 +63,14 @@ function renderProvider(children = <Consumer />) {
 beforeEach(() => {
   listarAlertasMock.mockReset()
   marcarLeidaMock.mockReset()
+  eliminarAlertaMock.mockReset()
   listarAlertasMock.mockResolvedValue(seedAlerts)
   marcarLeidaMock.mockImplementation(async (id: string) => {
     const alerta = seedAlerts.find((item) => item.id === id)
     if (!alerta) throw new Error('No existe')
     return { ...alerta, leida: true }
   })
+  eliminarAlertaMock.mockResolvedValue(undefined)
   Object.defineProperty(document, 'visibilityState', {
     configurable: true,
     value: 'visible',
@@ -101,6 +112,45 @@ describe('AlertsProvider', () => {
       expect(screen.getByTestId('pendientes')).toHaveTextContent('1'),
     )
     expect(screen.getByTestId('leidas')).toHaveTextContent('2')
+  })
+
+  it('elimina una alerta y actualiza los contadores', async () => {
+    const user = userEvent.setup()
+    renderProvider()
+
+    await waitFor(() =>
+      expect(screen.getByTestId('leidas')).toHaveTextContent('1'),
+    )
+
+    await user.click(screen.getByRole('button', { name: 'eliminar' }))
+
+    expect(eliminarAlertaMock).toHaveBeenCalledWith('a2')
+    await waitFor(() =>
+      expect(screen.getByTestId('leidas')).toHaveTextContent('0'),
+    )
+    expect(screen.getByTestId('pendientes')).toHaveTextContent('2')
+  })
+
+  it('recarga las alertas después de guardar una build', async () => {
+    vi.useFakeTimers()
+    renderProvider()
+
+    await act(async () => {
+      await Promise.resolve()
+      await Promise.resolve()
+    })
+    expect(listarAlertasMock).toHaveBeenCalledTimes(1)
+
+    act(() => {
+      window.dispatchEvent(new Event(BUILDS_CHANGED_EVENT))
+    })
+
+    await act(async () => {
+      vi.advanceTimersByTime(ALERTS_BUILD_REFRESH_MS)
+      await Promise.resolve()
+    })
+
+    expect(listarAlertasMock).toHaveBeenCalledTimes(2)
   })
 
   it('refresca al volver a la pestaña', async () => {

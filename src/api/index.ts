@@ -39,6 +39,7 @@ export const api = {
     ? {
         listarAlertas: real.listarAlertas,
         marcarLeida: real.marcarLeida,
+        eliminarAlerta: real.eliminarAlerta,
       }
     : {}),
 }

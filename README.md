@@ -73,7 +73,7 @@ Con esto:
 - `/components` usa `GET /api/componentes` y `GET /api/componentes/:id`;
 - `POST /api/simular` usa el simulador real y el catálogo para resolver TDP/benchmarks;
 - `POST /api/chat` usa el MCP real con las tools de catálogo, compatibilidad, builds y simulación;
-- `GET /api/alerts` y `PATCH /api/alerts/:id/read` usan el servicio real de alertas;
+- `GET /api/alerts`, `PATCH /api/alerts/:id/read` y `DELETE /api/alerts/:id` usan el servicio real de alertas;
 - el chat tiene timeout de 50s para permitir la respuesta del MCP.
 
 Para probar el modo real deben estar arriba: Auth Service, gateway, catálogo, simulador, MCP, alerts-service, Kafka y PostgreSQL. El gateway publica un evento `BuildGuardada` en Kafka al guardar una build; alerts-service lo consume y crea la alerta si el consumo supera el 85% de la fuente. Reinicia Vite después de cambiar las variables. Si un servicio no está disponible, la pantalla muestra el error correspondiente; no hay fallback automático a mock.
@@ -87,7 +87,7 @@ Con todos los flags reales se puede usar `VITE_USE_MOCKS=false`. Los flags sigue
 | `GET /componentes`, `GET /componentes/:id` | Catálogo y detalle de piezas |
 | `POST /simular` | Simular rendimiento |
 | `POST /builds`, `GET /builds`, `DELETE /builds/:id` | Gestión de builds |
-| `GET /alerts`, `PATCH /alerts/:id/read` | Alertas del usuario |
+| `GET /alerts`, `PATCH /alerts/:id/read`, `DELETE /alerts/:id` | Alertas del usuario |
 | `POST /chat` | Chat con la IA |
 
 > Ajustar las rutas a las definitivas del `hardwareguru-api-gateway`.
@@ -160,9 +160,10 @@ Con todos los flags reales se puede usar `VITE_USE_MOCKS=false`. Los flags sigue
 - `/alerts` muestra las alertas pendientes y leídas en pestañas con contador.
 - Cada alerta incluye build, mensaje, sugerencia, porcentaje de uso de la fuente y fecha.
 - **Ver build** abre `/builds?open=<buildId>`. Si la build fue eliminada, se reemplaza por “Esta build ya no existe”.
-- **Marcar como leída** ejecuta `PATCH /alerts/:id/read`, mueve la alerta a “Leídas” y baja el contador. Si falla, la alerta sigue pendiente y se muestra un aviso.
+- **Marcar como leída** ejecuta `PATCH /alerts/:id/read`, mueve la alerta a "Leídas" y baja el contador. Si falla, la alerta sigue pendiente y se muestra un aviso.
+- Las alertas leídas muestran **Eliminar**, con confirmación. Ejecuta `DELETE /alerts/:id` y desaparece de la lista y del contador.
 - El contador de la navegación usa `AlertsProvider`, compartido con la página y el Dashboard.
-- Las alertas se consultan al entrar, al volver a la pestaña y cada 60 s mientras la pestaña está visible.
+- Las alertas se consultan al entrar, al volver a la pestaña, al guardar una build (con una pequeña espera para el consumo de Kafka) y cada 60 s mientras la pestaña está visible.
 - El polling y los listeners se limpian al desmontar el provider y al cerrar sesión.
 - Si el servicio de alertas falla, el resto de la app sigue funcionando; la página muestra el error con reintento.
 - `AlertCard` y `useAlerts` quedan disponibles para el Dashboard (009).
@@ -237,7 +238,7 @@ VITE_MOCK_DELAY_MS=400
 - `VITE_REAL_CATALOG=true` usa el gateway real para catálogo.
 - `VITE_REAL_SIMULATION=true` usa `POST /api/simular`.
 - `VITE_REAL_CHAT=true` usa `POST /api/chat` y el MCP Server.
-- `VITE_REAL_ALERTS=true` usa `GET /api/alerts` y `PATCH /api/alerts/:id/read`.
+- `VITE_REAL_ALERTS=true` usa `GET /api/alerts`, `PATCH /api/alerts/:id/read` y `DELETE /api/alerts/:id`.
 - `VITE_REAL_BUILDS=true` usa `POST /api/builds`, `GET /api/builds` y `DELETE /api/builds/:id`.
 - `VITE_MOCK_DELAY_MS` simula latencia para poder ver los estados de carga.
 - El indicador del sidebar muestra **modo mock**, **modo híbrido** o **api conectada** según los flags activos.

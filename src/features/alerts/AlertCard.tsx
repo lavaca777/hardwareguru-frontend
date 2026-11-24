@@ -8,6 +8,8 @@ interface AlertCardProps {
   onVer: () => void
   onMarcar?: () => void
   marcando?: boolean
+  onEliminar?: () => void
+  eliminando?: boolean
 }
 
 export function AlertCard({
@@ -16,6 +18,8 @@ export function AlertCard({
   onVer,
   onMarcar,
   marcando = false,
+  onEliminar,
+  eliminando = false,
 }: AlertCardProps) {
   return (
     <ProblemNotice
@@ -52,6 +56,17 @@ export function AlertCard({
 
           {alerta.leida && (
             <span className="text-xs font-medium text-muted">Leída</span>
+          )}
+
+          {alerta.leida && onEliminar && (
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={onEliminar}
+              loading={eliminando}
+            >
+              Eliminar
+            </Button>
           )}
         </>
       }

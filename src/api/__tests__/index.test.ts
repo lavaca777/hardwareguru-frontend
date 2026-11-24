@@ -107,6 +107,7 @@ describe('selector de API', () => {
     expect(api.register).toBe(real.register)
     expect(api.listarAlertas).toBe(real.listarAlertas)
     expect(api.marcarLeida).toBe(real.marcarLeida)
+    expect(api.eliminarAlerta).toBe(real.eliminarAlerta)
     expect(api.guardarBuild).toBe(mocks.guardarBuild)
   })
 })

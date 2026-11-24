@@ -47,6 +47,39 @@ describe('AlertCard', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('permite eliminar una alerta leída', async () => {
+    const user = userEvent.setup()
+    const onEliminar = vi.fn()
+
+    render(
+      <AlertCard
+        alerta={seedAlerts[1]}
+        buildExists
+        onVer={vi.fn()}
+        onEliminar={onEliminar}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Eliminar' }))
+
+    expect(onEliminar).toHaveBeenCalledOnce()
+  })
+
+  it('no muestra Eliminar en una alerta pendiente', () => {
+    render(
+      <AlertCard
+        alerta={seedAlerts[0]}
+        buildExists
+        onVer={vi.fn()}
+        onEliminar={vi.fn()}
+      />,
+    )
+
+    expect(
+      screen.queryByRole('button', { name: 'Eliminar' }),
+    ).not.toBeInTheDocument()
+  })
+
   it('reemplaza Ver build si la build ya no existe', () => {
     render(
       <AlertCard

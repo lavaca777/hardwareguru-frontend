@@ -95,6 +95,30 @@ describe('AlertsPage', () => {
     expect(screen.getByText(ALERTA_FUENTE)).toBeInTheDocument()
   })
 
+  it('elimina una alerta leída después de confirmar', async () => {
+    const user = userEvent.setup()
+    renderPage()
+
+    await screen.findByText('2 pendientes')
+    await user.click(screen.getByRole('tab', { name: /Leídas/ }))
+
+    const card = alertCardFor(ALERTA_LEIDA)
+    await user.click(
+      within(card).getByRole('button', { name: 'Eliminar' }),
+    )
+
+    const dialog = screen.getByRole('dialog')
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Eliminar' }),
+    )
+
+    expect(await screen.findByText('Alerta eliminada.')).toBeInTheDocument()
+    expect(screen.queryByText(ALERTA_LEIDA)).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('tab', { name: /Leídas/ }),
+    ).toHaveTextContent('0')
+  })
+
   it('abre el detalle de la build desde Ver build', async () => {
     const user = userEvent.setup()
     renderPage()

@@ -26,6 +26,7 @@ vi.mock('@/api', () => ({
   api: {
     listarAlertas: listarAlertasMock,
     marcarLeida: marcarLeidaMock,
+    eliminarAlerta: vi.fn(),
     listarBuilds: listarBuildsMock,
     eliminarBuild: vi.fn(),
   },

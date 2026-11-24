@@ -7,5 +7,5 @@ export {
 export { listarComponentes, obtenerComponente } from './componentes'
 export { simular } from './simulacion'
 export { guardarBuild, listarBuilds, eliminarBuild } from './builds'
-export { listarAlertas, marcarLeida } from './alertas'
+export { listarAlertas, marcarLeida, eliminarAlerta } from './alertas'
 export { enviarMensaje } from './chat'

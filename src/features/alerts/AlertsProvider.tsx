@@ -8,7 +8,11 @@ import {
 } from 'react'
 import { api } from '@/api'
 import { registerResetHandler } from '@/auth/reset'
-import { ALERTS_POLL_MS } from '@/config'
+import {
+  ALERTS_BUILD_REFRESH_MS,
+  ALERTS_POLL_MS,
+} from '@/config'
+import { BUILDS_CHANGED_EVENT } from '@/features/builds/events'
 import type { Alerta } from '@/types'
 import {
   AlertsContext,
@@ -73,7 +77,39 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
     )
   }, [])
 
+  const eliminarAlerta = useCallback(async (id: string) => {
+    await api.eliminarAlerta(id)
+    setAlertas((prev) => prev.filter((alerta) => alerta.id !== id))
+  }, [])
+
   useEffect(() => registerResetHandler(reset), [reset])
+
+  useEffect(() => {
+    if (!activo) return
+
+    let refreshTimer: number | undefined
+    const handleBuildSaved = () => {
+      if (refreshTimer !== undefined) {
+        window.clearTimeout(refreshTimer)
+      }
+
+      // El alert-service consume Kafka de forma asíncrona; esperamos un
+      // momento antes de recargar para que la alerta ya esté persistida.
+      refreshTimer = window.setTimeout(() => {
+        refreshTimer = undefined
+        void load(true)
+      }, ALERTS_BUILD_REFRESH_MS)
+    }
+
+    window.addEventListener(BUILDS_CHANGED_EVENT, handleBuildSaved)
+
+    return () => {
+      if (refreshTimer !== undefined) {
+        window.clearTimeout(refreshTimer)
+      }
+      window.removeEventListener(BUILDS_CHANGED_EVENT, handleBuildSaved)
+    }
+  }, [activo, load])
 
   useEffect(() => {
     if (!activo) return
@@ -115,6 +151,7 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
       cargando,
       error,
       marcarLeida,
+      eliminarAlerta,
       recargar,
       reset,
       ensureLoaded,
@@ -126,6 +163,7 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
       cargando,
       error,
       marcarLeida,
+      eliminarAlerta,
       recargar,
       reset,
       ensureLoaded,

@@ -5,7 +5,12 @@ import {
   login,
   register,
 } from '../auth'
-import { listarAlertas, marcarLeida, resetMockAlerts } from '../alertas'
+import {
+  eliminarAlerta,
+  listarAlertas,
+  marcarLeida,
+  resetMockAlerts,
+} from '../alertas'
 import { enviarMensaje } from '../chat'
 import { listarComponentes, obtenerComponente } from '../componentes'
 import {
@@ -172,6 +177,16 @@ describe('mocks de builds y alertas', () => {
 
   it('falla al marcar una alerta inexistente', async () => {
     await expect(marcarLeida('a-no-existe')).rejects.toMatchObject({
+      status: 404,
+      code: 'NOT_FOUND',
+    })
+  })
+
+  it('elimina una alerta y falla si no existe', async () => {
+    await eliminarAlerta('a2')
+    expect((await listarAlertas()).some((item) => item.id === 'a2')).toBe(false)
+
+    await expect(eliminarAlerta('a-no-existe')).rejects.toMatchObject({
       status: 404,
       code: 'NOT_FOUND',
     })
