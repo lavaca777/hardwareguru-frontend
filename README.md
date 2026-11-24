@@ -240,6 +240,7 @@ VITE_MOCK_DELAY_MS=400
 - `VITE_REAL_ALERTS=true` usa `GET /api/alerts` y `PATCH /api/alerts/:id/read`.
 - `VITE_REAL_BUILDS=true` usa `POST /api/builds`, `GET /api/builds` y `DELETE /api/builds/:id`.
 - `VITE_MOCK_DELAY_MS` simula latencia para poder ver los estados de carga.
+- El indicador del sidebar muestra **modo mock**, **modo híbrido** o **api conectada** según los flags activos.
 - Los flags son independientes: se puede conectar solo un servicio y mantener el resto en mocks.
 - Vite solo expone al navegador las variables con prefijo `VITE_`. **Nunca** pongas secretos aquí.
 - No hardcodear URLs: siempre leer `import.meta.env.VITE_API_URL`.

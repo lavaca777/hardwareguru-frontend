@@ -32,6 +32,30 @@ export const USE_REAL_CHAT = import.meta.env.VITE_REAL_CHAT === 'true'
 export const USE_REAL_ALERTS = import.meta.env.VITE_REAL_ALERTS === 'true'
 export const USE_REAL_BUILDS = import.meta.env.VITE_REAL_BUILDS === 'true'
 
+export type ApiMode = 'mock' | 'hybrid' | 'real'
+
+export const USE_REAL_SERVICES =
+  USE_REAL_AUTH ||
+  USE_REAL_CATALOG ||
+  USE_REAL_SIMULATION ||
+  USE_REAL_BUILDS ||
+  USE_REAL_CHAT ||
+  USE_REAL_ALERTS
+
+const ALL_SERVICES_ARE_REAL =
+  USE_REAL_AUTH &&
+  USE_REAL_CATALOG &&
+  USE_REAL_SIMULATION &&
+  USE_REAL_BUILDS &&
+  USE_REAL_CHAT &&
+  USE_REAL_ALERTS
+
+export const API_MODE: ApiMode = !USE_MOCKS || ALL_SERVICES_ARE_REAL
+  ? 'real'
+  : USE_REAL_SERVICES
+    ? 'hybrid'
+    : 'mock'
+
 export const CHAT_REQUEST_TIMEOUT_MS = 50_000
 
 const parsedMockDelay = Number(import.meta.env.VITE_MOCK_DELAY_MS ?? 400)

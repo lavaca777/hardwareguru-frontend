@@ -16,7 +16,7 @@ import {
   StackIcon,
   UserIcon,
 } from '@/components/icons'
-import { USE_MOCKS } from '@/config'
+import { API_MODE } from '@/config'
 import { BuilderProvider } from '@/features/builder/BuilderProvider'
 import { BuildsProvider } from '@/features/builds/BuildsProvider'
 import { ComponentesProvider } from '@/features/components/ComponentesProvider'
@@ -135,16 +135,37 @@ function AccountLink({ onNavigate }: { onNavigate?: () => void }) {
   )
 }
 
+const API_STATUS = {
+  mock: {
+    label: 'modo mock',
+    shortLabel: 'mock',
+    dataLabel: 'datos simulados',
+    dotClass: 'bg-patina',
+  },
+  hybrid: {
+    label: 'modo híbrido',
+    shortLabel: 'híbrido',
+    dataLabel: 'datos híbridos',
+    dotClass: 'bg-copper',
+  },
+  real: {
+    label: 'api conectada',
+    shortLabel: 'api',
+    dataLabel: 'datos reales',
+    dotClass: 'bg-ok',
+  },
+} as const
+
+const apiStatus = API_STATUS[API_MODE]
+
 function SystemStatus() {
   return (
     <div className="mt-3 flex items-center gap-2 rounded-lg border border-line bg-panel px-3 py-2 font-mono text-[10px] text-muted">
       <span
-        className={`h-1.5 w-1.5 rounded-full ${
-          USE_MOCKS ? 'bg-patina' : 'bg-ok'
-        }`}
+        className={`h-1.5 w-1.5 rounded-full ${apiStatus.dotClass}`}
         aria-hidden="true"
       />
-      {USE_MOCKS ? 'modo mock' : 'api conectada'}
+      {apiStatus.label}
     </div>
   )
 }
@@ -279,7 +300,7 @@ export function AppShell({ alertCount = 0 }: AppShellProps) {
               </span>
             )}
             <span className="hidden rounded-md border border-line bg-panel px-2 py-1 font-mono text-[10px] text-muted sm:inline">
-              {USE_MOCKS ? 'mock' : 'api'}
+              {apiStatus.shortLabel}
             </span>
           </div>
         </header>
@@ -298,7 +319,7 @@ export function AppShell({ alertCount = 0 }: AppShellProps) {
 
         <footer className="border-t border-line px-4 py-4 lg:px-8">
           <p className="font-mono text-[10px] text-muted">
-            HardwareGuru · {USE_MOCKS ? 'datos simulados' : 'datos reales'}
+            HardwareGuru · {apiStatus.dataLabel}
           </p>
         </footer>
       </div>
