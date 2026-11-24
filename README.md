@@ -141,6 +141,8 @@ Cuando el gateway exponga `/api/builds`, se podrá desactivar el mock de builds.
 - El modal de guardado valida nombre obligatorio y máximo de 60 caracteres, avisa si el nombre se repite y permite continuar.
 - Al guardar aparece un aviso con enlace directo a **Mis builds**.
 - Los estados `RIESGO` e `INCOMPATIBLE` muestran su `motivo` y sugerencia cuando aplica.
+- El guardado no se bloquea por estado: una build en riesgo o incluso incompatible se puede conservar en el historial. Esto es necesario para que una build riesgosa pueda generar alertas y para no perder configuraciones que el usuario quiera revisar.
+- Solo se exige una simulación vigente; si cambian las piezas o la resolución, hay que volver a simular para guardar el resultado correcto.
 
 ### Mis builds (007)
 
@@ -297,7 +299,7 @@ Meta: **≥ 60% de cobertura** (Vitest + React Testing Library sobre jsdom).
 
 Los tests viven en carpetas `__tests__/` junto al módulo que prueban.
 
-Estado actual: **335 tests** y **95.7% de cobertura** de líneas.
+Estado actual: **336 tests** y **95.8% de cobertura** de líneas.
 
 ## Estructura
 

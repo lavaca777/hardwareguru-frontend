@@ -27,7 +27,7 @@ export function saveBuildErrorMessage(error: unknown): string {
   }
 
   if (error.code === 'INCOMPATIBLE_BUILD') {
-    return 'No puedes guardar una build incompatible. Revisa las piezas.'
+    return 'No pudimos guardar la build. Revisa las piezas e inténtalo de nuevo.'
   }
 
   switch (error.code) {

@@ -1,10 +1,16 @@
-import type { Build, BuildSeleccion, Resolucion } from '@/types'
+import type {
+  Build,
+  BuildSeleccion,
+  Resolucion,
+  SimulacionResultado,
+} from '@/types'
 import { apiDelete, apiGet, apiPost } from './client'
 
 export function guardarBuild(
   nombre: string,
   seleccion: BuildSeleccion,
   resolucion: Resolucion,
+  _resultado?: SimulacionResultado,
 ): Promise<Build> {
   return apiPost<Build>('/builds', { nombre, ...seleccion, resolucion })
 }

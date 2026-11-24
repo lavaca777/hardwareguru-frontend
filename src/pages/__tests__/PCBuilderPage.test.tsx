@@ -108,6 +108,21 @@ describe('PCBuilderPage', () => {
     ).toBeInTheDocument()
   })
 
+  it('permite guardar una build en riesgo', async () => {
+    const user = userEvent.setup()
+    renderPage('/builder?from=b2')
+
+    await screen.findByText('5 de 5 piezas')
+    await user.click(
+      screen.getByRole('button', { name: 'Simular rendimiento' }),
+    )
+
+    expect(await screen.findByText('En riesgo')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Guardar build' }),
+    ).toBeEnabled()
+  })
+
   it('simula, marca el resultado desactualizado y guarda la build', async () => {
     const user = userEvent.setup()
     renderPage('/builder?from=b1')

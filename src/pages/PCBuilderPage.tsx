@@ -188,8 +188,7 @@ export function PCBuilderPage() {
   const canSave =
     simulation.resultado !== null &&
     !simulation.desactualizado &&
-    !simulation.simulando &&
-    simulation.resultado.estado !== 'INCOMPATIBLE'
+    !simulation.simulando
 
   let saveDisabledReason: string | undefined
   if (!completa) {
@@ -201,9 +200,6 @@ export function PCBuilderPage() {
   } else if (simulation.desactualizado) {
     saveDisabledReason =
       'Vuelve a simular porque la selección cambió.'
-  } else if (simulation.resultado.estado === 'INCOMPATIBLE') {
-    saveDisabledReason =
-      'No puedes guardar una build incompatible.'
   }
 
   return (
@@ -400,11 +396,11 @@ export function PCBuilderPage() {
 
       {saveOpen &&
         simulation.resultado &&
-        !simulation.desactualizado &&
-        simulation.resultado.estado !== 'INCOMPATIBLE' && (
+        !simulation.desactualizado && (
           <SaveBuildModal
             seleccion={seleccion}
             resolucion={resolucion}
+            resultado={simulation.resultado}
             onClose={() => setSaveOpen(false)}
             onSaved={(build) => {
               setSaveOpen(false)

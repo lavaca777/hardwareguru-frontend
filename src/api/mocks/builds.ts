@@ -1,4 +1,9 @@
-import type { Build, BuildSeleccion, Resolucion } from '@/types'
+import type {
+  Build,
+  BuildSeleccion,
+  Resolucion,
+  SimulacionResultado,
+} from '@/types'
 import { ApiError } from '../errors'
 import { piezasDe, seedBuilds } from './data'
 import { mockDelay } from './delay'
@@ -15,17 +20,12 @@ export async function guardarBuild(
   nombre: string,
   seleccion: BuildSeleccion,
   resolucion: Resolucion,
+  resultadoSimulado?: SimulacionResultado,
 ): Promise<Build> {
   await mockDelay()
 
-  const resultado = calcularResultado(seleccion, resolucion)
-  if (resultado.estado === 'INCOMPATIBLE') {
-    throw new ApiError(
-      422,
-      'INCOMPATIBLE_BUILD',
-      resultado.motivo ?? 'La build es incompatible.',
-    )
-  }
+  const resultado =
+    resultadoSimulado ?? calcularResultado(seleccion, resolucion)
 
   const build: Build = {
     id: `b-${Date.now()}`,

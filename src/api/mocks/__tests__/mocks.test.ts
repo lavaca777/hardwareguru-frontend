@@ -144,20 +144,22 @@ describe('mocks de builds y alertas', () => {
     expect(await listarBuilds()).toHaveLength(4)
   })
 
-  it('no guarda builds incompatibles', async () => {
-    await expect(
-      guardarBuild(
-        'Incompatible',
-        {
-          cpuId: 'cpu-14600k',
-          placaId: 'mb-b650',
-          ramId: 'ram-ddr5-32',
-          gpuId: 'gpu-4060',
-          fuenteId: 'psu-500',
-        },
-        '1080p',
-      ),
-    ).rejects.toMatchObject({ status: 422, code: 'INCOMPATIBLE_BUILD' })
+  it('guarda builds incompatibles para conservar el historial', async () => {
+    const build = await guardarBuild(
+      'Incompatible',
+      {
+        cpuId: 'cpu-14600k',
+        placaId: 'mb-b650',
+        ramId: 'ram-ddr5-32',
+        gpuId: 'gpu-4060',
+        fuenteId: 'psu-500',
+      },
+      '1080p',
+    )
+
+    expect(build.resultado.estado).toBe('INCOMPATIBLE')
+
+    await eliminarBuild(build.id)
   })
 
   it('marca una alerta como leída', async () => {

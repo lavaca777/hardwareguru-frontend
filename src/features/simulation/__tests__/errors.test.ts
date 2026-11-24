@@ -27,7 +27,7 @@ describe('mensajes de simulación', () => {
   it('traduce errores al guardar', () => {
     expect(
       saveBuildErrorMessage(new ApiError(422, 'INCOMPATIBLE_BUILD', '')),
-    ).toContain('incompatible')
+    ).toContain('guardar')
     expect(saveBuildErrorMessage(new ApiError(0, 'NETWORK', ''))).toContain(
       'conectar',
     )

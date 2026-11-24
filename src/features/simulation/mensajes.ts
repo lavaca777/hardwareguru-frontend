@@ -33,6 +33,8 @@ export function getProblemMessage(
       texto:
         resultado.motivo ??
         'Revisa la compatibilidad de las piezas seleccionadas.',
+      sugerencia:
+        'Puedes guardarla para conservar el historial, pero no se recomienda comprarla así.',
     }
   }
 

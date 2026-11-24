@@ -7,12 +7,18 @@ import {
   ProblemNotice,
   TextField,
 } from '@/components/ui'
-import type { Build, BuildSeleccion, Resolucion } from '@/types'
+import type {
+  Build,
+  BuildSeleccion,
+  Resolucion,
+  SimulacionResultado,
+} from '@/types'
 import { saveBuildErrorMessage } from './errors'
 
 interface SaveBuildModalProps {
   seleccion: BuildSeleccion
   resolucion: Resolucion
+  resultado: SimulacionResultado
   onClose: () => void
   onSaved: (build: Build) => void
 }
@@ -20,6 +26,7 @@ interface SaveBuildModalProps {
 export function SaveBuildModal({
   seleccion,
   resolucion,
+  resultado,
   onClose,
   onSaved,
 }: SaveBuildModalProps) {
@@ -77,6 +84,7 @@ export function SaveBuildModal({
         nombreLimpio,
         seleccion,
         resolucion,
+        resultado,
       )
       setSaving(false)
       onSaved(build)

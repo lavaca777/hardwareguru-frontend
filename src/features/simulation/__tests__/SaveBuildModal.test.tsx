@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '@/api/errors'
 import { seedBuilds } from '@/api/mocks/data'
-import type { Build } from '@/types'
+import type { Build, SimulacionResultado } from '@/types'
 import { SaveBuildModal } from '../SaveBuildModal'
 
 const { guardarBuildMock, listarBuildsMock } = vi.hoisted(() => ({
@@ -26,6 +26,14 @@ const seleccion = {
   fuenteId: 'psu-650',
 }
 
+const resultado: SimulacionResultado = {
+  consumoEstimadoW: 420,
+  cuelloBotellaPct: 50,
+  resolucion: '1080p',
+  estado: 'RIESGO',
+  motivo: 'La fuente va justa.',
+}
+
 beforeEach(() => {
   guardarBuildMock.mockReset()
   listarBuildsMock.mockReset()
@@ -38,6 +46,7 @@ function renderModal(onClose = vi.fn(), onSaved = vi.fn()) {
     <SaveBuildModal
       seleccion={seleccion}
       resolucion="1080p"
+      resultado={resultado}
       onClose={onClose}
       onSaved={onSaved}
     />,
@@ -91,6 +100,7 @@ describe('SaveBuildModal', () => {
       'PC Gamer 1080p',
       seleccion,
       '1080p',
+      resultado,
     )
     expect(onSaved).toHaveBeenCalledWith(seedBuilds[0])
   })
@@ -107,7 +117,7 @@ describe('SaveBuildModal', () => {
 
     expect(
       await screen.findByText(
-        'No puedes guardar una build incompatible. Revisa las piezas.',
+        'No pudimos guardar la build. Revisa las piezas e inténtalo de nuevo.',
       ),
     ).toBeInTheDocument()
   })
