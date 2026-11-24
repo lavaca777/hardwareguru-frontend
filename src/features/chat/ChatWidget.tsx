@@ -13,7 +13,6 @@ import {
 } from '@/components/icons'
 import { ConfirmDialog } from '@/components/ui'
 import { MAX_MENSAJE_CHAT } from '@/config'
-import { notifyBuildsChanged } from '@/features/builds/events'
 import { useChat } from './chatContext'
 import { ChatMessage } from './ChatMessage'
 import { CHAT_SUGGESTIONS, CHAT_WELCOME } from './constants'
@@ -139,15 +138,6 @@ export function ChatWidget() {
               </p>
             </div>
             <div className="ml-auto flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => notifyBuildsChanged()}
-                aria-label="Actualizar builds y alertas"
-                title="Actualizar builds y alertas"
-                className="grid h-8 w-8 place-items-center rounded-md border border-transparent text-muted hover:border-line hover:text-ink"
-              >
-                <ReloadIcon className="h-4 w-4" />
-              </button>
               <button
                 type="button"
                 onClick={handleNueva}

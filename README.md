@@ -152,6 +152,7 @@ Con todos los flags reales se puede usar `VITE_USE_MOCKS=false`. Los flags sigue
 - El detalle muestra las 5 piezas, resolución, uso de la fuente y el `motivo` cuando no está balanceada.
 - **Abrir en el armador** navega a `/builder?from=<buildId>`.
 - **Eliminar** pide confirmación, actualiza la lista y muestra un aviso.
+- **Actualizar** vuelve a consultar las builds sin recargar la página; se usa, por ejemplo, después de crear una build desde el chat.
 - Deep link: `/builds?open=<buildId>` abre directamente el detalle.
 - `BuildsProvider` comparte la lista con Dashboard y Alertas. Al guardar una build se dispara un evento para refrescarla.
 
@@ -195,7 +196,6 @@ Con todos los flags reales se puede usar `VITE_USE_MOCKS=false`. Los flags sigue
 - Errores de IA/red y respuestas vacías generan un mensaje de sistema con **Reintentar**.
 - **Nueva conversación** pide confirmación solo si ya hay mensajes.
 - Al recibir una respuesta, el chat emite `hardwareguru:builds-changed` para refrescar builds y alertas sin recargar la página ni perder la conversación. Es útil cuando Guru crea una build con una tool del MCP.
-- El header del chat incluye **Actualizar builds y alertas** para forzar ese refresco manualmente.
 - El acceso rápido **Preguntar a Guru** del Dashboard abre la ventana mediante `hardwareguru:open-chat`.
 - Contrato actual: `POST /chat` con `{ mensaje, historial }`. El gateway lo adapta a `{ prompt }` para el MCP y propaga `x-user-id`.
 - Las respuestas de Guru se renderizan con un Markdown ligero y seguro: negritas, cursivas, listas, títulos, código y enlaces `http/https`. No se interpreta HTML ni se usa `dangerouslySetInnerHTML`.

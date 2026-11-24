@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { resetMockBuilds } from '@/api/mocks'
+import { guardarBuild, resetMockBuilds } from '@/api/mocks'
 import { ToastProvider } from '@/components/ui'
 import { BuildsProvider } from '@/features/builds/BuildsProvider'
 import { MyBuildsPage } from '../MyBuildsPage'
@@ -128,6 +128,33 @@ describe('MyBuildsPage', () => {
     expect(
       screen.queryByRole('heading', { name: 'Oficina silenciosa' }),
     ).not.toBeInTheDocument()
+  })
+
+  it('actualiza la lista con el botón Actualizar', async () => {
+    const user = userEvent.setup()
+    renderPage()
+
+    await screen.findByText('4 builds guardadas')
+    await guardarBuild(
+      'Build externa',
+      {
+        cpuId: 'cpu-9600x',
+        placaId: 'mb-b650',
+        ramId: 'ram-ddr5-16',
+        gpuId: 'gpu-4060',
+        fuenteId: 'psu-650',
+      },
+      '1080p',
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Actualizar' }))
+
+    expect(
+      await screen.findByText('5 builds guardadas'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Build externa' }),
+    ).toBeInTheDocument()
   })
 
   it('abre el detalle desde el deep link ?open', async () => {

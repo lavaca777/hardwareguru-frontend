@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
+import { ReloadIcon } from '@/components/icons'
 import { PageHeader } from '@/components/PageHeader'
 import {
   Button,
@@ -147,9 +148,19 @@ export function MyBuildsPage() {
             : `${builds.length} builds guardadas`
         }
         actions={
-          <Button onClick={() => navigate('/builder')}>
-            Armar nuevo PC
-          </Button>
+          <>
+            <Button
+              variant="secondary"
+              onClick={recargar}
+              loading={cargando}
+              leftIcon={<ReloadIcon className="h-4 w-4" />}
+            >
+              Actualizar
+            </Button>
+            <Button onClick={() => navigate('/builder')}>
+              Armar nuevo PC
+            </Button>
+          </>
         }
       />
 
